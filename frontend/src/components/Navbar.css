@@ -1,0 +1,362 @@
+/* 🔥 Navbar Neon */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0px;
+    width: 100%;
+    height: auto;
+    background: #d3d3d3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); */
+    z-index: 1;
+    transition: all 0.3s ease-in-out;
+
+}
+
+/* 🚀 Esconde a Navbar em telas pequenas */
+/* @media (max-width: 1150px) {
+    .navbar {
+        opacity: 0;
+        visibility:hidden;
+    }
+} */
+
+.nav-starter{
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap:wrap;
+    gap: 5px;
+    /* margin: 0px; */
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    color: #141414;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    flex-wrap:nowrap;
+    gap: 5px;
+    margin-right: 20px;
+    /* margin: 0px; */
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    
+    
+}
+
+.nav-options {
+    list-style: none;
+    display: flex;
+    /* gap: 20px; */
+    padding: 0;
+    margin: 0 20px;
+    
+}
+
+.nav-list li {
+    position: relative;
+    padding: 0px;
+    
+    
+}
+
+.nav-starter li {
+    position: relative;
+    padding: 0px;
+    
+    
+}
+
+.nav-options li{
+    
+    position: relative;
+    padding: 5px;
+    
+}
+
+.nav-options a {
+    text-decoration: none;
+    /* color: #00eaff; */
+    
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ✨ Efeito Neon */
+.nav-options a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 8px #141414;
+}
+
+/* 🚀 Barra inferior ao passar o mouse */
+.nav-options a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #d3d3d3;
+    transition: all 0.3s ease-in-out;
+}
+
+.nav-options a:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+.nav-list a {
+    text-decoration: none;
+    color: #141414;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 5px;
+    /* padding: 10px 15px; */
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ✨ Efeito Neon */
+.nav-list a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    /* box-shadow: 0 0 8px #ffffff; */
+    
+}
+
+/* 🚀 Barra inferior ao passar o mouse */
+.nav-list a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #d3d3d3;
+    transition: all 0.3s ease-in-out;
+    
+}
+
+.nav-list a:hover::after {
+    width: 100%;
+    left: 0;
+    
+}
+
+
+/* Evita sobreposição do conteúdo */
+body {
+    padding-top: 0px;
+}
+
+@media (max-width: 1150px) {
+    body {
+        padding-top: 0px;
+    }
+}
+
+/* Estilização do botão de login */
+.login-button {
+    background: #d3d3d3;
+    color: #0d1117;
+    font-weight: bold;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.login-button:hover {
+    background: rgba(0, 255, 255, 0.7);
+}
+
+
+
+/* Estilização do botão do usuário */
+.user-menu {
+    position: relative;
+}
+
+.user-button {
+    background: none;
+    color: #d3d3d3;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+}
+
+.user-button:hover {
+    color: rgba(255, 51, 0, 0);
+}
+
+/* Estilização do dropdown */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #d3d3d3;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    border-radius: 5px;
+    list-style: none;
+    padding: 10px 0;
+    min-width: 150px;
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease-in-out;
+}
+
+.user-menu:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-menu li {
+    padding: 10px 15px;
+    transition: background 0.3s ease-in-out;
+}
+
+.dropdown-menu li:hover {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.dropdown-menu a {
+    text-decoration: none;
+    color: #141414;
+    display: block;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: #141414;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.nav-starter a {
+    text-decoration: none;
+    color: #141414;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 5px;
+    /* padding: 10px 15px; */
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.nav-starter a:hover {
+    background: rgba(255, 255, 255, 0.0);
+    /* box-shadow: 0 0 8px #ffffff; */
+    
+}
+
+
+.nav-starter a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    /* background: #ffffff; */
+    transition: all 0.3s ease-in-out;
+    
+}
+
+.nav-starter a:hover::after {
+    width: 100%;
+    left: 0;
+    
+}
+
+
+@media (max-width: 768px) {
+    .nav-text {
+        display: none; /* Esconde o texto */
+    }
+    
+    .nav-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 20px; /* Ajuste conforme necessário */
+        height: 20px;
+    }
+
+    .nav-item svg {
+        font-size: 1.5 rem; /* Aumenta os ícones */
+    }
+
+    .login-button span {
+        display: none;
+    }
+    
+    .login-button {
+       
+       
+        padding: 10px 15px;
+        border-radius: 5px;
+        
+    }
+}
+
+/* 🌟 Oculta os textos inicialmente */
+.logout-button a span  {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap;
+}
+
+/* 🌟 Exibe textos quando expandido */
+
+.logout-button a span {
+    opacity: 1;
+}
+
+/* 🔹 Botão de logout */
+.logout-button {
+    width: 80px; /* Igual aos outros botões */
+    padding: 10px;
+    /* background: #d32f2f; */
+    color: #141414;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+
+
+.logout-button svg {
+    font-size: 2rem !important;
+    min-width: 40px;
+    text-align: center;
+}
+
+.logout-button span {
+    margin-left: 8px;
+}

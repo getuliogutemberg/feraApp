@@ -1,0 +1,22 @@
+/* Unauthorized.css */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+    text-align: center;
+    background-color:rgba(16, 28, 68, 1) ;
+  }
+  
+  .link {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  

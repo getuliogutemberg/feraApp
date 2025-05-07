@@ -1,0 +1,20 @@
+/* Unauthorized.css */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .link {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  

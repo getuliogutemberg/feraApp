@@ -1,0 +1,79 @@
+#root {
+  /* max-width: 1280px; */
+  margin: 0 auto;
+  /* padding: 2rem; */
+  /* text-align: center; */
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+.MuiDrawer-paper {
+  background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo com opacidade */
+  box-shadow: none; /* Remove a sombra */
+}
+
+
+.hover-link:hover {
+   scale: 1.1;
+   background: rgb(0, 20, 39);
+   filter: drop-shadow(0 0 0.5em #61dafbaa);
+   /* filter:invert() */
+}
+
+iframe {
+  border: none;
+}
+
+
+
+
+@keyframes waterEffect {
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes neonGlow {
+  0% { text-shadow: 0 0 10px rgba(0, 191, 255, 0.8), 0 0 20px rgba(0, 191, 255, 0.6); }
+  50% { text-shadow: 0 0 20px rgba(0, 191, 255, 0.8), 0 0 30px rgba(0, 191, 255, 1); }
+  100% { text-shadow: 0 0 10px rgba(0, 191, 255, 0.8), 0 0 20px rgba(0, 191, 255, 0.6); }
+}
+
+@keyframes starryEffect {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(20px); }
+}
