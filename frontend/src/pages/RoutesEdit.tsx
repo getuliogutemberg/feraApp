@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ChartLine,ChartColumn ,ListFilter  } from 'lucide-react';
 import { 
   Typography, Button, Box, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Paper, Dialog, 
@@ -24,6 +25,10 @@ const iconOptions = [
   { value: "employees", label: "Employees", icon: <FaUserTie /> },
   { value: "finance", label: "Finance", icon: <FaDollarSign /> },
   { value: "parking", label: "Parking", icon: <FaCar /> },
+  { value: "chartLine", label: "chartLine", icon: <ChartLine /> },
+  { value: "chartColumn", label: "chartColumn", icon: <ChartColumn/> },
+  { value: "listFilter", label: "listFilter", icon: <ListFilter/> },
+  
 ];
 
 interface Route {

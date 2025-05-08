@@ -70,15 +70,15 @@ interface SubRoute {
   component: string;
   name: string;
   requiredRole: string[];
-  pageId?: string;
-  reportId?: string,
-  workspaceId?: string,
+  pageId?: string | null;
+  reportId?: string | null,
+  workspaceId?: string | null,
 }
 
 interface MenuGroup {
-  workspaceId: null;
-  reportId: null;
-  pageId: null;
+  pageId?: string | null;
+  reportId?: string | null,
+  workspaceId?: string | null,
   _id: string;
   name: string;
   component: string;
@@ -168,18 +168,22 @@ function App() {
             reportId: null,
             pageId: null
           },
-          {
+          ...routes
+          .filter((route) => route.name === "Ganho Agregado")
+          .map((route) => ({
             _id: "4",
-            name: "Ganho Agregado",
-            icon: "file",
-            component: "Dashboard Power BI",
-            path: "/ganho-agregado",
+            path: route.path,
+            icon: route.icon,
+            name: route.name,
+            component: route.component,
+            requiredRole: route.requiredRole,
+            pageId: route.pageId ,
+            reportId: route.reportId,
+            workspaceId: route.workspaceId,
             subRoutes: [],
-            requiredRole: ["OWNER", "ADMIN", "CLIENT"],
-            workspaceId: null,
-            reportId: null,
-            pageId: null
-          },
+            // Add any other required MenuGroup fields here
+          })),
+          
           {
             _id: "5",
             "name": "Projeções",
@@ -252,12 +256,7 @@ function App() {
         const response = await axios.get('http://localhost:5000/configuration');
         setSettings(response.data);
         
-        // // Update PowerBI configuration in backend
-        // await axios.post('http://localhost:5000/updatePBIConfig', {
-        //   clientId: response.data.pbiKeys.clientId,
-        //   clientSecret: response.data.pbiKeys.clientSecret,
-        //   authority: response.data.pbiKeys.authority
-        // });
+       
         
       } catch (error) {
         console.error('Erro ao buscar configurações:', error);
@@ -327,48 +326,9 @@ function App() {
       />
 )}
       
-     {/* {routes.map((route: SubRoute) => (
-          <Route
-            key={route._id}
-            path={route.path}
-            element={
-              <ProtectedRoute requiredCategory={route.requiredRole}   >
-                {route.component === "Dashboard Power BI" ? <DashPBI pageId={route.pageId || null} reportId={route.reportId  || null } workspaceId={route.workspaceId  || null} />:
-                route.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
-                route.component === "Teste" ? <Teste /> :
-                 <></>
-                }
-              </ProtectedRoute>
-            }
-          />
-        ))} */}
+   
 
-{[{
-            _id: "3",
-            name: "Configuração de Itens Estratégicos do Estoque",
-            icon: "settings",
-            component: 'Gestão de Grupos e Materiais',
-            path: "/Configuração-de-Itens-Estratégicos-do-Estoque",
-            subRoutes: [],
-            pageId: null,
-            reportId: null,
-            workspaceId: null,
-            requiredRole: ["OWNER", "ADMIN", "CLIENT"]
-          }].map( (route) => (
-            <Route
-            key={route._id}
-            path={route.path}
-            element={
-              <ProtectedRoute requiredRole={route.requiredRole}  >
-                {route.component === "Dashboard Power BI" ? <DashPBI pageId={route.pageId || null} reportId={route.reportId  || null } workspaceId={route.workspaceId  || null} />:
-                route.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
-                route.component === "Teste" ? <Teste /> :
-                 <></>
-                }
-              </ProtectedRoute>
-            }
-          />
-          ))}
+
 
 
         {/* <Route path="/" element={<Home />} /> */}

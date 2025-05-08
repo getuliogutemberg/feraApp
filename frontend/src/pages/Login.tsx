@@ -352,9 +352,9 @@ export default function Login() {
                    fontSize: '2.5rem',
                    margin:'50px'
                 }}><div style={{scale:0.8,width:'45px',height:'45px',background:"#f3811e",display:'flex',flexDirection:"column",justifyContent:"start",alignItems:"start"}}>
-                    <div style={{width:'0px',height:'15px',background:"#d3d3d3"}}></div>
-                    <div style={{width:'32px',height:'16px',background:"#d3d3d3",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'17px',height:'12px',background:"#f3811e"}}></div></div>
-                    <div style={{width:'17px',height:'15px',background:"#d3d3d3",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'12px',height:'13px',background:"#f3811e"}}></div></div>
+                    <div style={{width:'0px',height:'15px',background:"#eeeeee"}}></div>
+                    <div style={{width:'32px',height:'16px',background:"#eeeeee",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'17px',height:'12px',background:"#f3811e"}}></div></div>
+                    <div style={{width:'17px',height:'15px',background:"#eeeeee",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'12px',height:'13px',background:"#f3811e"}}></div></div>
                    
                     </div>FERA</div>
 

@@ -131,7 +131,7 @@ const handleChangePassword = async () => {
       justifyContent: 'start',
       px: 2,
       ml: "80px",
-      background: "#0A1C44",
+      background: "#e6e6e6",
       width: "calc(100vw - 110px)",
       height: "calc(100vh - 70px)",
       mt: "60px",
@@ -141,14 +141,14 @@ const handleChangePassword = async () => {
       <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
         <Typography variant="h3" sx={{ 
           fontWeight: "bold", 
-          color: "white", 
+          color: "#141414", 
           mb: 2,
           fontSize:{ xs: "1.5rem", sm: "2rem", md: "2.5rem" } 
         }}>
           Configurações da Conta
         </Typography>
         <Typography variant="h6" sx={{ 
-          color: "#fff", 
+          color: "#141414", 
           mb: 4, 
           fontSize: { xs: "1rem", sm: "1rem", md: "1rem" },
           opacity: 0.7
@@ -171,7 +171,7 @@ const handleChangePassword = async () => {
           justifyContent: "center",
           width: "100%",
           maxWidth: "650px",
-          backgroundColor: '#1F2A4C',
+          backgroundColor: '#d3d3d3',
           borderRadius: "8px",
         }}>
           <Box sx={{ position: "relative", mb: 4 }}>
@@ -183,11 +183,11 @@ const handleChangePassword = async () => {
                   position: "absolute",
                   top: "100px",
                   right: "38%",
-                  bgcolor: "#0A1C44",
-                  color: "white",
+                  bgcolor: "#e6e6e6",
+                  color: "#141414",
                   boxShadow: 3,
                   '&:hover': {
-                    bgcolor: '#152347'
+                    bgcolor: '#d3d3d3'
                   }
                 }}
               >
@@ -251,7 +251,7 @@ const handleChangePassword = async () => {
             disabled={!editing}
             sx={{ 
               mb: 2,
-              background:"#fff",
+              background:"#e0e0e0",
               color:"#000",
               '& .MuiOutlinedInput-root': {
                 
@@ -271,9 +271,9 @@ const handleChangePassword = async () => {
                 variant="contained"
                 onClick={() => setOpenPasswordModal(true)}
                 sx={{ 
-                  backgroundColor: '#0A1C44',
+                  backgroundColor: '#f3811e',
                   '&:hover': {
-                    backgroundColor: '#152347'
+                    backgroundColor: '#f3811e'
                   }
                 }}
               >
@@ -297,9 +297,9 @@ const handleChangePassword = async () => {
                 startIcon={<Edit />}
                 onClick={() => setEditing(true)}
                 sx={{ 
-                  backgroundColor: '#0A1C44',
+                  backgroundColor: '#f3811e',
                   '&:hover': {
-                    backgroundColor: '#152347'
+                    backgroundColor: '#f3811e'
                   }
                 }}
               >
@@ -315,8 +315,8 @@ const handleChangePassword = async () => {
         onClose={() => setOpenPasswordModal(false)}
         PaperProps={{
           sx: {
-            backgroundColor: '#1F2A4C',
-            color: '#fff'
+            backgroundColor: '#e0e0e0',
+            color: '#141414'
           }
         }}
       >
@@ -337,13 +337,13 @@ const handleChangePassword = async () => {
               mb: 2, 
               mt: 2,
               '& .MuiOutlinedInput-root': {
-                color: '#fff',
+                color: '#141414',
                 '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                  borderColor: 'rgba(0, 0, 0, 0.7)',
                 },
               },
               '& .MuiInputLabel-root': {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(0, 0, 0, 0.7)',
               },
             }}
           />
@@ -356,13 +356,13 @@ const handleChangePassword = async () => {
             sx={{ 
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                color: '#fff',
+                color: '#141414',
                 '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                  borderColor: 'rgba(0, 0, 0, 0.7)',
                 },
               },
               '& .MuiInputLabel-root': {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(0, 0, 0, 0.7)',
               },
             }}
           />
@@ -375,19 +375,19 @@ const handleChangePassword = async () => {
             sx={{ 
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                color: '#fff',
+                color: '#141414',
                 '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                  borderColor: 'rgba(0, 0, 0, 0.7)',
                 },
               },
               '& .MuiInputLabel-root': {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(0, 0, 0, 0.7)',
               },
             }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenPasswordModal(false)} sx={{ color: '#fff' }}>
+          <Button onClick={() => setOpenPasswordModal(false)} sx={{ color: '#141414' }}>
             Cancelar
           </Button>
           <Button 
@@ -395,9 +395,12 @@ const handleChangePassword = async () => {
             variant="contained" 
             disabled={passwordLoading}
             sx={{ 
-              backgroundColor: '#0A1C44',
+              backgroundColor: '#e6e6e6',
+              color:"#141414",
               '&:hover': {
-                backgroundColor: '#152347'
+                backgroundColor: '#f3811e',
+              color:"#fff",
+
               }
             }}
           >

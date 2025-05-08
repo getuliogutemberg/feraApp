@@ -1,13 +1,13 @@
 import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
-
+import { ChartLine,ChartColumn ,ListFilter,CircleEllipsis,Wallpaper   } from 'lucide-react';
 import { 
     FaTachometerAlt, 
     FaCog, FaBars, 
   // FaUser,
-  FaGavel,
-  FaFileAlt,
+  // FaGavel,
+  // FaFileAlt,
   FaChevronDown,
   FaChevronRight,
   FaUsers,
@@ -81,7 +81,7 @@ const Sidebar = () => {
           {
             _id: "2",
             "name": "Diagnóstico",
-            "icon": "file",
+            "icon": "chartLine",
             "component": 'MenuGroup',
             "path": "/diagnóstico",
             "subRoutes": [
@@ -103,7 +103,7 @@ const Sidebar = () => {
           {
             _id: "3",
             "name": "Análise de Criticidade",
-            "icon": "file",
+            "icon": "listFilter",
             "component": 'MenuGroup',
             "path": "/criticidade",
             "subRoutes": [
@@ -122,19 +122,25 @@ const Sidebar = () => {
             ].filter((router) => router.component === "Dashboard Power BI" ),
             "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
-          {
+          ...routes
+          .filter((route) => route.name === "Ganho Agregado")
+          .map((route) => ({
             _id: "4",
-            name: "Ganho Agregado",
-            icon: "file",
-            component: "Dashboard Power BI",
-            path: "/ganho-agregado",
+            path: route.path,
+            icon: route.icon,
+            name: route.name,
+            component: route.component,
+            requiredRole: route.requiredRole,
+            pageId: route.pageId ,
+            reportId: route.reportId,
+            workspaceId: route.workspaceId,
             subRoutes: [],
-            requiredRole: ["OWNER", "ADMIN", "CLIENT"]
-          },
+            // Add any other required MenuGroup fields here
+          })),
           {
             _id: "5",
             "name": "Projeções",
-            "icon": "file",
+            "icon": "listFilter",
             "component": 'MenuGroup',
             "path": "/projeções",
             "subRoutes": [
@@ -156,7 +162,7 @@ const Sidebar = () => {
           {
             _id: "6",
             "name": "Priorizações",
-            "icon": "file",
+            "icon": "chartColumn",
             "component": 'MenuGroup',
             "path": "/priorizações",
             "subRoutes": [
@@ -196,7 +202,10 @@ const Sidebar = () => {
     switch (iconName) {
       case 'dashboard': return <FaTachometerAlt />;
       case 'menu': return <FaBars />;
-      case 'file': return <FaFileAlt />;
+      case 'chartLine': return <ChartLine />;
+      case 'chartColumn': return <ChartColumn/>;
+      case 'listFilter': return <ListFilter/>;
+    
       case 'settings': return <FaCog />;
       case 'users': return <FaUsers />;
       case 'employees': return <FaUserTie />;
@@ -233,7 +242,8 @@ const Sidebar = () => {
                 className="group-header"
                 onClick={() => toggleGroup(group._id)}
                 style={{
-                  // background: expandedGroups.has(group._id) ? "rgba(255, 255, 255, 0.0)" : "#d3d3d3",
+                  paddingLeft:'15px',
+                  background: !expandedGroups.has(group._id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.5)",
                 }}
               >
                 <Box sx={{
@@ -248,7 +258,8 @@ const Sidebar = () => {
 
               {expandedGroups.has(group._id) && (
                 <ul className="submenu" style={{
-                  background: "rgba(255, 255, 255, 0.2)",
+                  background: !expandedGroups.has(group._id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.3)",
+                  
                   color: "#ffffff",
                   padding: "0px",
                   display: "flex",
@@ -275,13 +286,13 @@ const Sidebar = () => {
              <li key={group.path} title={group.name}>
              <Link 
              
+             style={{margin:0}}
              // onMouseLeave={()=>toggleGroup(group._id)}
              onClick={() =>{ 
                // setExpanded(false);
-               
                }} to={`${group.path}`}>
                {getIcon(group.icon)}
-               <span>{group.name}</span>
+               <span >{group.name}</span>
              </Link>
            </li>
           ))}
@@ -294,8 +305,8 @@ const Sidebar = () => {
       </ul>
 
       <ul className="sidebar-options">
-        {['ADMIN','OWNER'].includes(user.className) && <li title="Opcões"><Link to="/opções"><FaGavel /> <span>Opções</span></Link></li> }
-        {['OWNER'].includes(user.className) && <li title="Administrador"><Link to="/administrador"><FaCog /><span>Administrador</span></Link></li>}
+        {['ADMIN','OWNER'].includes(user.className) && <li title="Opcões"><Link to="/opções"><CircleEllipsis  /> <span>Opções</span></Link></li> }
+        {['OWNER'].includes(user.className) && <li title="Administrador"><Link to="/administrador"><Wallpaper  /><span>Administrador</span></Link></li>}
         
 
         
