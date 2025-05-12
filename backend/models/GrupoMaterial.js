@@ -12,7 +12,7 @@ const GrupoMaterial = sequelize.define('GrupoMaterial', {
     type: DataTypes.DATE
   }
 }, {
-  schema:'app',
+  schema:'internal',
   tableName: 'grupo_material',
   timestamps: false
 });

@@ -86,7 +86,7 @@ const User = sequelize.define("User", {
     defaultValue: false
   },
 }, { 
-  schema:'app',
+  schema:'internal',
   timestamps: true
  });
 
@@ -124,7 +124,7 @@ const Route = sequelize.define("Route", {
     allowNull: true
   }
 }, {
-  schema: 'app',
+  schema: 'internal',
   timestamps: true
 })
 
@@ -194,7 +194,7 @@ const Configuration = sequelize.define('Configuration', {
   }
 }
 }, {
-  schema:'app',
+  schema:'internal',
 timestamps: true
 })
 
@@ -220,7 +220,7 @@ const Alert = sequelize.define('Alert', {
     defaultValue: null
   }
 }, {
-  schema: 'app',
+  schema: 'internal',
   timestamps: true
 });
 

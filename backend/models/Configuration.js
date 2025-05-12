@@ -67,7 +67,7 @@ const Configuration = sequelize.define('Configuration', {
     }
   }
 }, {
-  schema:'app',
+  schema:'internal',
   timestamps: true
 });
 

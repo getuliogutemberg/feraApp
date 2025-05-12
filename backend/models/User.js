@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
   status: { type: String, default: '' },
   isActive: { type: Boolean, default: false },
 }, { 
-  schema:'app',
+  schema:'internal',
   timestamps: true
  });
 

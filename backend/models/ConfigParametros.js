@@ -25,7 +25,7 @@ const ConfigParametros = sequelize.define('ConfigParametros', {
     type: DataTypes.JSONB
   }
 }, {
-  schema:'app',
+  schema:'internal',
   tableName: 'config_parametros',
   timestamps: false
 });

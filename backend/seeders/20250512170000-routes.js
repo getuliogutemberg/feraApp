@@ -2,7 +2,7 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert({ tableName: 'Routes', schema: 'app' }, [
+    await queryInterface.bulkInsert({ tableName: 'Routes', schema: 'internal' }, [
       {
         path: '/rcp',
         component: 'Dashboard Power BI',
@@ -151,6 +151,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete({ tableName: 'Routes', schema: 'app' }, null, {});
+    await queryInterface.bulkDelete({ tableName: 'Routes', schema: 'internal' }, null, {});
   }
 }; 

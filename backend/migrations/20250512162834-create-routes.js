@@ -20,13 +20,13 @@ module.exports = {
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE }
     },{
-      schema: 'app'
+      schema: 'internal'
     });
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.dropTable('Routes',{
-      schema: 'app'
+      schema: 'internal'
     });
   }
 };

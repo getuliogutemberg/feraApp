@@ -9,7 +9,7 @@ const DicionarioGrupo = sequelize.define('DicionarioGrupo', {
     type: DataTypes.STRING
   }
 }, {
-  schema:'app',
+  schema:'internal',
   tableName: 'dicionario_grupos',
   timestamps: false
 });

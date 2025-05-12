@@ -13,7 +13,7 @@ const ClasseMaterial = sequelize.define('ClasseMaterial', {
     defaultValue: null
   }
 }, {
-  schema:'app',
+  schema:'internal',
   timestamps: true
 });
 

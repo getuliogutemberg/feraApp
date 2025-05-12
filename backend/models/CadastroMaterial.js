@@ -24,7 +24,7 @@ const CadastroMaterial = sequelize.define('CadastroMaterial', {
     type: DataTypes.INTEGER
   }
 }, {
-  schema:'app',
+  schema:'internal',
   tableName: 'cadastro_material',
   timestamps: false
 });

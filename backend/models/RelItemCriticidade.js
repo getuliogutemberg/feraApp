@@ -13,7 +13,7 @@ const RelItemCriticidade = sequelize.define('RelItemCriticidade', {
     defaultValue: null
   }
 }, {
-  schema:'app',
+  schema:'internal',
   timestamps: true
 });
 

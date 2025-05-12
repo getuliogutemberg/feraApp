@@ -21,7 +21,7 @@ const EstrategiaParametros = sequelize.define('EstrategiaParametros', {
     type: DataTypes.DATE
   }
 }, {
-  schema:'app',
+  schema:'internal',
   tableName: 'estrategia_parametros',
   timestamps: false
 });

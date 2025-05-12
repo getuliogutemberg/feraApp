@@ -8,7 +8,7 @@ module.exports = {
     const passwordCliente = await bcrypt.hash('123', 12);
     const passwordAdmin = await bcrypt.hash('123', 12);
     const passwordOwner = await bcrypt.hash('123', 12);
-    await queryInterface.bulkInsert({ tableName: 'Users', schema: 'app' }, [
+    await queryInterface.bulkInsert({ tableName: 'Users', schema: 'internal' }, [
       {
         name: 'Cliente',
         email: 'cliente@fera.com.br',
@@ -43,6 +43,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.bulkDelete({ tableName: 'Users', schema: 'app' }, null, {});
+    await queryInterface.bulkDelete({ tableName: 'Users', schema: 'internal' }, null, {});
   }
 };

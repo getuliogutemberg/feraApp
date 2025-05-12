@@ -13,7 +13,7 @@ const DicionarioCriticidade = sequelize.define('DicionarioCriticidade', {
     defaultValue: null
   }
 }, {
-  schema:'app',
+  schema:'internal',
   timestamps: true
 });
 

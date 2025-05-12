@@ -13,7 +13,7 @@ const UnidadeMaterial = sequelize.define('UnidadeMaterial', {
     defaultValue: null
   }
 }, {
-  schema:'app',
+  schema:'internal',
   timestamps: true
 });
 

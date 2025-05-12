@@ -4,12 +4,12 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     // Primeiro, verifica se o schema existe
     const schemas = await queryInterface.showAllSchemas();
-    if (!schemas.includes('app')) {
-      await queryInterface.createSchema('app');
+    if (!schemas.includes('internal')) {
+      await queryInterface.createSchema('internal');
     }
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropSchema('app', { cascade: true });
+    await queryInterface.dropSchema('internal', { cascade: true });
   }
 };

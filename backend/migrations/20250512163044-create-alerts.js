@@ -18,13 +18,13 @@ module.exports = {
       createdAt: { allowNull: false, type: Sequelize.DATE },
       updatedAt: { allowNull: false, type: Sequelize.DATE }
     },{
-      schema: 'app'
+      schema: 'internal'
     });
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.dropTable('Alerts',{
-      schema: 'app'
+      schema: 'internal'
     });
   }
 };

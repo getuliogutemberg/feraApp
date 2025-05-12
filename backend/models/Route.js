@@ -35,7 +35,7 @@ const Route = sequelize.define('Route', {
     allowNull: true
   }
 }, {
-   schema:'app',
+   schema:'internal',
   timestamps: true
 });
 
