@@ -174,7 +174,7 @@ class ParamsController {
     try {
       const { materialId } = req.params;
 
-      const material = await grupo_material.findOne({  cod_item_material: materialId });
+      const material = await grupo_material.findOne({ where: { cod_item_material: materialId } });
 
       if (!material) {
         return res.status(404).json({ message: "Item não encontrado" });
@@ -182,24 +182,25 @@ class ParamsController {
 
       const groupId = material.cod_grupo;
 
-      const grupoParams = await estrategia_parametros.findOne({ cod_grupo: groupId, cod_item_material: 0 });
+      const grupoParams = await estrategia_parametros.findOne({ where: { cod_grupo: groupId, cod_item_material: 0 } });
 
       if (!grupoParams) {
         return res.status(404).json({ message: "Parâmetros base do grupo não encontrados" });
       }
 
-      const estrategia = await estrategia_parametros.findOneAndUpdate(
-        { cod_item_material: materialId },
-        { 
-          cods_parametro: grupoParams.cods_parametro, 
-          cods_opcao: grupoParams.cods_opcao, 
-          client: grupoParams.client, 
+      await estrategia_parametros.update(
+        {
+          cods_parametro: grupoParams.cods_parametro,
+          cods_opcao: grupoParams.cods_opcao,
+          client: grupoParams.client,
           data_estrategia: new Date()
         },
-        { new: true }
+        { where: { cod_item_material: materialId } }
       );
 
-      return res.json({ message: "Item atualizado com os parâmetros do grupo", estrategia});
+      const estrategia = await estrategia_parametros.findOne({ where: { cod_item_material: materialId } });
+
+      return res.json({ message: "Item atualizado com os parâmetros do grupo", estrategia });
 
     } catch (error) {
       return res.status(500).json({ error: error.message });

@@ -4,7 +4,7 @@ import axios, { AxiosInstance } from "axios";
 // Tipagem para o User
 interface User {
   customIcon: string;
-  _id: string;
+  id: string;
   name: string;
   email: string;
   category: string;

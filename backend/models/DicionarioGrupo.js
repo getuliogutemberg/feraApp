@@ -1,8 +1,17 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const DicionarioGrupoSchema = new mongoose.Schema({
-  cod_grupo: Number,
-  desc_grupo: String,
+const DicionarioGrupo = sequelize.define('DicionarioGrupo', {
+  cod_grupo: {
+    type: DataTypes.INTEGER
+  },
+  desc_grupo: {
+    type: DataTypes.STRING
+  }
+}, {
+  schema:'app',
+  tableName: 'dicionario_grupos',
+  timestamps: false
 });
 
-module.exports = mongoose.model("dicionario_grupos",DicionarioGrupoSchema);
+module.exports = DicionarioGrupo;

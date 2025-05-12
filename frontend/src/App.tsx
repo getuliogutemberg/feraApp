@@ -79,7 +79,7 @@ interface MenuGroup {
   pageId?: string | null;
   reportId?: string | null,
   workspaceId?: string | null,
-  _id: string;
+  id: string;
   name: string;
   component: string;
   icon: string;
@@ -111,7 +111,7 @@ function App() {
       try {
         const response = routes &&  [
           // {
-          //   _id: "1",
+          //   id: "1",
           //   name: "Teste",
           //   icon: "parking",
           //   path: "/test",
@@ -119,13 +119,13 @@ function App() {
           //   requiredRole: ["OWNER"],
           // },
           {
-            _id: "2",
+            id: "2",
             "name": "Diagnóstico",
-            "icon": "file",
+            "icon": "chartLine",
             "component": 'MenuGroup',
             "path": "/diagnóstico",
             "subRoutes": [
-              ...routes.map((route) => ({
+              ...routes.filter((route)=> ["RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
                 path: route.path,
                 icon: route.icon,
                 name: route.name,
@@ -138,19 +138,16 @@ function App() {
              
              
             ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"],
-            workspaceId: null,
-            reportId: null,
-            pageId: null
+            "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
           {
-            _id: "3",
+            id: "3",
             "name": "Análise de Criticidade",
-            "icon": "file",
+            "icon": "listFilter",
             "component": 'MenuGroup',
             "path": "/criticidade",
             "subRoutes": [
-              ...routes.map((route) => ({
+              ...routes.filter((route)=> ["Interrupções","Energia não Distribuída","DEC/FEC"].includes(route.name)).map((route) => ({
                 path: route.path,
                 icon: route.icon,
                 name: route.name,
@@ -163,15 +160,12 @@ function App() {
              
              
             ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"],
-            workspaceId: null,
-            reportId: null,
-            pageId: null
+            "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
           ...routes
           .filter((route) => route.name === "Ganho Agregado")
           .map((route) => ({
-            _id: "4",
+            id: "4",
             path: route.path,
             icon: route.icon,
             name: route.name,
@@ -183,15 +177,14 @@ function App() {
             subRoutes: [],
             // Add any other required MenuGroup fields here
           })),
-          
           {
-            _id: "5",
+            id: "5",
             "name": "Projeções",
-            "icon": "file",
+            "icon": "listFilter",
             "component": 'MenuGroup',
             "path": "/projeções",
             "subRoutes": [
-              ...routes.map((route) => ({
+              ...routes.filter((route)=> ["Projeção de RUL","Projeção de Manutenção"].includes(route.name)).map((route) => ({
                 path: route.path,
                 icon: route.icon,
                 name: route.name,
@@ -204,19 +197,29 @@ function App() {
              
              
             ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"],
-            workspaceId: null,
-            reportId: null,
-            pageId: null
+            "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
           {
-            _id: "6",
+            id: "6",
             "name": "Priorizações",
-            "icon": "file",
+            "icon": "chartColumn",
             "component": 'MenuGroup',
             "path": "/priorizações",
             "subRoutes": [
-              ...routes.map((route) => ({
+             
+             
+             
+            ],
+            "requiredRole": ["OWNER","ADMIN","CLIENT"]
+          },
+          ...(routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).length > 0 ? [{
+            id: "7",
+            name: "",
+            icon: "chartColumn", // ou outro ícone de sua escolha
+            component: 'MenuGroup',
+            path: "/menu",
+            subRoutes: [
+              ...routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
                 path: route.path,
                 icon: route.icon,
                 name: route.name,
@@ -226,16 +229,9 @@ function App() {
                 reportId: route.reportId,
                 workspaceId: route.workspaceId,
               })),
-              
-             
-             
-            ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"],
-            workspaceId: null,
-            reportId: null,
-            pageId: null
-          },
-
+          ],
+            requiredRole: ["OWNER", "ADMIN", "CLIENT"]
+          }] : [])
          
          
         ];
@@ -284,7 +280,7 @@ function App() {
      {menuGroups.map((group) =>
       group.subRoutes.map((sub) => (
     <Route
-      key={group._id + sub.path}
+      key={group.id + sub.path}
       path={group.path + sub.path}
       element=
         {sub.component === "Dashboard Power BI" ? 
@@ -309,10 +305,10 @@ function App() {
 )}
 
 
-{menuGroups.filter((menu) => menu.component === "Dashboard Power BI").map((group) =>
+{menuGroups.map((group) =>
       
         <Route
-        key={group._id}
+        key={group.id}
         path={group.path}
         element={
           <ProtectedRoute requiredRole={group.requiredRole}  >

@@ -1,20 +1,33 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const ConfigParametrosSchema = new mongoose.Schema({
-  client: String,
-  cod_parametro: Number,
-  cod_opcao: Number,
-  desc_parametro: String,
-  desc_opcao: String,
-  tipo: {
-    type: String,
-    enum: ['boolean', 'radio'],
-    required: true
+const ConfigParametros = sequelize.define('ConfigParametros', {
+  client: {
+    type: DataTypes.STRING
   },
-  opcoes: [{
-    cod_opcao: Number,
-    desc_opcao: String
-  }]
+  cod_parametro: {
+    type: DataTypes.INTEGER
+  },
+  cod_opcao: {
+    type: DataTypes.INTEGER
+  },
+  desc_parametro: {
+    type: DataTypes.STRING
+  },
+  desc_opcao: {
+    type: DataTypes.STRING
+  },
+  tipo: {
+    type: DataTypes.ENUM('boolean', 'radio'),
+    allowNull: false
+  },
+  opcoes: {
+    type: DataTypes.JSONB
+  }
+}, {
+  schema:'app',
+  tableName: 'config_parametros',
+  timestamps: false
 });
 
-module.exports = mongoose.model("config_parametros", ConfigParametrosSchema);
+module.exports = ConfigParametros;

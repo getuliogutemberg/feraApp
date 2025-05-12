@@ -21,13 +21,13 @@ import axios from "axios";
 import CRITERIOS_PADRAO from "../components/CriteriosPadrao";
 
 interface Grupo {
-  id: string; // _id da API
+  id: string; // id da API
   cod_grupo: number; // cod_grupo da API
   desc_grupo: string; // desc_grupo da API
 }
 
 interface Item {
-  _id: string; // Identificador único do item
+  id: string; // Identificador único do item
   cod_item_material: number; // Código do item
   cod_itemmaterial_ext: number; // Código externo do item
   desc_material: string; // Descrição do item

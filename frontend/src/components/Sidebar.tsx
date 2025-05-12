@@ -35,7 +35,7 @@ interface SubRoute {
 }
 
 interface MenuGroup {
-  _id: string;
+  id: string;
   name: string;
   component: string;
   icon: string;
@@ -71,7 +71,7 @@ const Sidebar = () => {
       try {
         const response = routes && [
           // {
-          //   _id: "1",
+          //   id: "1",
           //   name: "Teste",
           //   icon: "parking",
           //   path: "/test",
@@ -79,7 +79,7 @@ const Sidebar = () => {
           //   requiredRole: ["OWNER"],
           // },
           {
-            _id: "2",
+            id: "2",
             "name": "Diagnóstico",
             "icon": "chartLine",
             "component": 'MenuGroup',
@@ -101,7 +101,7 @@ const Sidebar = () => {
             "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
           {
-            _id: "3",
+            id: "3",
             "name": "Análise de Criticidade",
             "icon": "listFilter",
             "component": 'MenuGroup',
@@ -125,7 +125,7 @@ const Sidebar = () => {
           ...routes
           .filter((route) => route.name === "Ganho Agregado")
           .map((route) => ({
-            _id: "4",
+            id: "4",
             path: route.path,
             icon: route.icon,
             name: route.name,
@@ -138,7 +138,7 @@ const Sidebar = () => {
             // Add any other required MenuGroup fields here
           })),
           {
-            _id: "5",
+            id: "5",
             "name": "Projeções",
             "icon": "listFilter",
             "component": 'MenuGroup',
@@ -160,18 +160,38 @@ const Sidebar = () => {
             "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
           {
-            _id: "6",
+            id: "6",
             "name": "Priorizações",
             "icon": "chartColumn",
             "component": 'MenuGroup',
             "path": "/priorizações",
             "subRoutes": [
-              
+             
              
              
             ],
             "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
+          ...(routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).length > 0 ? [{
+            id: "7",
+            name: "",
+            icon: "chartColumn", // ou outro ícone de sua escolha
+            component: 'MenuGroup',
+            path: "/menu",
+            subRoutes: [
+              ...routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
+                path: route.path,
+                icon: route.icon,
+                name: route.name,
+                component: route.component,
+                requiredRole: route.requiredRole, // <- antes tava errado aqui
+                pageId: route.pageId,
+                reportId: route.reportId,
+                workspaceId: route.workspaceId,
+              })),
+          ],
+            requiredRole: ["OWNER", "ADMIN", "CLIENT"]
+          }] : [])
          
          
         ];
@@ -235,15 +255,15 @@ const Sidebar = () => {
         {user && menuGroups
           // .filter(group => user.className !== 'OWNER' ? group.requiredRole?.includes(user.category) : group)
           .map((group) => (
-            group.requiredRole?.includes(user.className) && group.component ===  'MenuGroup' ? <li key={group._id}  >
+            group.requiredRole?.includes(user.className) && group.component ===  'MenuGroup' ? <li key={group.id}  >
               
               <div 
               title={group.name}
                 className="group-header"
-                onClick={() => toggleGroup(group._id)}
+                onClick={() => toggleGroup(group.id)}
                 style={{
                   paddingLeft:'15px',
-                  background: !expandedGroups.has(group._id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.5)",
+                  background: !expandedGroups.has(group.id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.5)",
                 }}
               >
                 <Box sx={{
@@ -252,13 +272,13 @@ const Sidebar = () => {
 
                 {expanded && <span>{group.name}</span>}
                 { (
-                  expandedGroups.has(group._id) ? <FaChevronDown /> : <FaChevronRight />
+                  expandedGroups.has(group.id) ? <FaChevronDown /> : <FaChevronRight />
                 )}
               </div>
 
-              {expandedGroups.has(group._id) && (
+              {expandedGroups.has(group.id) && (
                 <ul className="submenu" style={{
-                  background: !expandedGroups.has(group._id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.3)",
+                  background: !expandedGroups.has(group.id) ? "rgba(255, 255, 255, 0.0)" : "rgba(243,129,30,0.3)",
                   
                   color: "#ffffff",
                   padding: "0px",
@@ -270,7 +290,7 @@ const Sidebar = () => {
                   {group.subRoutes.map((route) => (
                     <li key={route.path} title={route.name}>
                       <Link 
-                      // onMouseLeave={()=>toggleGroup(group._id)}
+                      // onMouseLeave={()=>toggleGroup(group.id)}
                       onClick={() =>{ 
                         // setExpanded(false);
                         
@@ -287,7 +307,7 @@ const Sidebar = () => {
              <Link 
              
              style={{margin:0}}
-             // onMouseLeave={()=>toggleGroup(group._id)}
+             // onMouseLeave={()=>toggleGroup(group.id)}
              onClick={() =>{ 
                // setExpanded(false);
                }} to={`${group.path}`}>

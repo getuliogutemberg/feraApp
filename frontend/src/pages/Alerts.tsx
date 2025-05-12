@@ -4,7 +4,7 @@ import { Error, Warning, Info, CheckCircle, Edit, Delete } from "@mui/icons-mate
 import axios from 'axios';
 
 interface Alert {
-  _id: string;
+  id: string;
   type: string;
   title: string;
   description: string;
@@ -24,7 +24,7 @@ const iconMapping: Record<string, React.ReactNode> = {
 export default function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>(initialAlerts);
   const [newAlert, setNewAlert] = useState<Alert>({
-    _id: '',
+    id: '',
     type: '',
     title: '',
     description: '',
@@ -66,7 +66,7 @@ export default function Alerts() {
       await axios.post('http://localhost:5000/alerts', newAlert);
       loadAlerts();
       setNewAlert({
-        _id: '',
+        id: '',
         type: '',
         title: '',
         description: '',
@@ -117,7 +117,7 @@ export default function Alerts() {
     };
   
     try {
-      await axios.put(`http://localhost:5000/alerts/${updatedAlert._id}`, updatedAlert);
+      await axios.put(`http://localhost:5000/alerts/${updatedAlert.id}`, updatedAlert);
       loadAlerts();
       handleCloseEditModal();
     } catch (error) {
@@ -146,7 +146,7 @@ export default function Alerts() {
           <Typography variant="h6" color="text.secondary">Nenhum alerta pendente 🎉</Typography>
         ) : (
           alerts.map((alert) => (
-            <Fade in key={alert._id} timeout={500}>
+            <Fade in key={alert.id} timeout={500}>
               <Box sx={{ width: 400, minWidth: 300, height: "fit-content", boxShadow: 1, transition: "transform 0.3s, box-shadow 0.3s", "&:hover": { transform: "scale(1.02)", boxShadow: 6 } }}>
                 <Card sx={{ minHeight: 160, boxShadow: 3, transition: "transform 0.3s, box-shadow 0.3s", "&:hover": { transform: "scale(1.05)", boxShadow: 6 } }}>
                   <CardContent>
@@ -154,13 +154,13 @@ export default function Alerts() {
                     <Typography variant="h6" fontWeight="bold">{alert.title}</Typography>
                     <Typography variant="body2" color="text.secondary">{alert.description}</Typography>
                     <Box sx={{ mt: 2 }}>
-                      <Button variant="contained" color="success" startIcon={<CheckCircle />} onClick={() => markAsRead(alert._id)}>
+                      <Button variant="contained" color="success" startIcon={<CheckCircle />} onClick={() => markAsRead(alert.id)}>
                         Marcar como lido
                       </Button>
                       <Button variant="outlined" startIcon={<Edit />} onClick={() => openEdit(alert)}>
                         Editar
                       </Button>
-                      <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => deleteAlert(alert._id)}>
+                      <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => deleteAlert(alert.id)}>
                         Apagar
                       </Button>
                     </Box>

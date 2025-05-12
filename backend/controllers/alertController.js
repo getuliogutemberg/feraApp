@@ -1,10 +1,9 @@
-
 const { Alert } = require("../models/Alert");
 
 
 const getAlerts = async (req, res) => {
     try {
-      const alerts = (await Alert.find()).filter(alert => !alert.deletedAt);
+      const alerts = (await Alert.findAll()).filter(alert => !alert.deletedAt);
       res.json(alerts);
     } catch (error) {
       res.status(500).json({ message: error.message });

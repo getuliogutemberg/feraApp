@@ -1,10 +1,42 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const RouteSchema = new mongoose.Schema({
-  path: { type: String, required: true },
-  component: { type: String, required: true },
-  requiredRole: { type: [String], default: [] },
-  pageId: { type: String, required: false }
-}, { timestamps: true });
+const Route = sequelize.define('Route', {
+  path: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  component: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  requiredRole: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
+  },
+  pageId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  reportId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  workspaceId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
+}, {
+   schema:'app',
+  timestamps: true
+});
 
-module.exports = mongoose.model("Route", RouteSchema);
+module.exports = Route;

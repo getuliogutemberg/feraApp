@@ -1,4 +1,3 @@
-
 const bcrypt = require("bcryptjs");
 
 
@@ -11,7 +10,7 @@ const {
 const getUsers = async (req, res) => {
   try {
     // Verifica se já existe algum usuário no banco de dados
-    const existingUsers = await User.find();
+    const existingUsers = await User.findAll();
     
     // Se não houver usuários no banco, cria-os
     if (existingUsers.length === 0) {
@@ -33,7 +32,7 @@ const getUsers = async (req, res) => {
     }
 
     // Retorna os usuários do banco de dados
-    const usersFromDB = await User.find();
+    const usersFromDB = await User.findAll();
     res.status(200).json(usersFromDB);
 
   } catch (err) {
@@ -47,9 +46,7 @@ const createUser = async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 12);
   try {
-    const newUser = new User({ username, email, password:hashedPassword });
-
-    await newUser.save();
+    const newUser = await User.create({ username, email, password: hashedPassword });
     res.status(201).json(newUser);
   } catch (err) {
     res.status(500).json({ message: "Erro ao criar usuário" });
@@ -59,7 +56,8 @@ const createUser = async (req, res) => {
 // Atualizar usuário
 const updateUser = async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    await User.update(req.body, { where: { id: req.params.id } });
+    const updatedUser = await User.findByPk(req.params.id);
     res.json(updatedUser);
   } catch (err) {
     res.status(500).json({ message: "Erro ao atualizar usuário" });
@@ -69,7 +67,7 @@ const updateUser = async (req, res) => {
 // Excluir usuário
 const deleteUser = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    await User.destroy({ where: { id: req.params.id } });
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: "Erro ao excluir usuário" });

@@ -8,7 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 
 // Tipo para o usuário
 interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   password: string;
@@ -102,9 +102,9 @@ const Users = () => {
   };
 
   const handleSave = async () => {
-    if (editData && editData._id) {
+    if (editData && editData.id) {
       try {
-        await axios.put(`http://localhost:5000/users/${editData._id}`, editData);
+        await axios.put(`http://localhost:5000/users/${editData.id}`, editData);
         fetchUsers();
         handleClose();
       } catch (err) {
@@ -325,7 +325,7 @@ const Users = () => {
     </TableHead>
     <TableBody>
       {sortedUsers.map((user) => (
-        <TableRow key={user._id}>
+        <TableRow key={user.id}>
           <TableCell sx={{ display: { xs: "table-cell", sm: "table-cell" } }}><Avatar src={user.customIcon} sx={{ width: 32, height: 32, mx: "auto" }} /></TableCell>
 
           <TableCell sx={{ display: { xs: "table-cell", sm: "table-cell" } }}>{user.name}</TableCell>
@@ -336,7 +336,7 @@ const Users = () => {
           <TableCell sx={{ display: { xs: "none", sm: "table-cell" } }}>{user.isActive ? <CheckCircle /> : <Close />}</TableCell>
           <TableCell align="right" sx={{ display: { xs: "table-cell", sm: "table-cell" } }}>
             <IconButton onClick={() => handleEditClick(user)}><Edit /></IconButton>
-            <IconButton onClick={() => handleOpenDeleteDialog(user._id)} color="error"><Delete /></IconButton>
+            <IconButton onClick={() => handleOpenDeleteDialog(user.id)} color="error"><Delete /></IconButton>
           </TableCell>
         </TableRow>
       ))}

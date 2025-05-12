@@ -1,9 +1,20 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const UnidadeMaterialSchema = new mongoose.Schema({
-  cod_unidade: Number,
-  desc_unidade: String,
-  deletedAt: { type: Date, default: null },
-}, { timestamps: true });
+const UnidadeMaterial = sequelize.define('UnidadeMaterial', {
+  cod_unidade: {
+    type: DataTypes.INTEGER
+  },
+  desc_unidade: {
+    type: DataTypes.STRING
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    defaultValue: null
+  }
+}, {
+  schema:'app',
+  timestamps: true
+});
 
-module.exports = mongoose.model("UnidadeMaterial",UnidadeMaterialSchema);
+module.exports = UnidadeMaterial;

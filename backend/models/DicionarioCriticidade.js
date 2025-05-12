@@ -1,9 +1,20 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const DicionarioCriticidadeSchema = new mongoose.Schema({
-  cod_criticidade: Number,
-  data_criticidade: Date,
-  deletedAt: { type: Date, default: null },
-}, { timestamps: true });
+const DicionarioCriticidade = sequelize.define('DicionarioCriticidade', {
+  cod_criticidade: {
+    type: DataTypes.INTEGER
+  },
+  data_criticidade: {
+    type: DataTypes.DATE
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    defaultValue: null
+  }
+}, {
+  schema:'app',
+  timestamps: true
+});
 
-module.exports = mongoose.model("DicionarioCriticidade", DicionarioCriticidadeSchema);
+module.exports = DicionarioCriticidade;

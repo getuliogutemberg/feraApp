@@ -53,13 +53,13 @@ export default function Profile() {
   
 // Nova função para salvar alterações
 const handleSaveChanges = async () => {
-  if (!user?._id) return;
+  if (!user?.id) return;
   
   setLoading(true);
   setError(null);
   
   try {
-    const response = await axios.put(`http://localhost:5000/users/${user._id}`, {
+    const response = await axios.put(`http://localhost:5000/users/${user.id}`, {
       name,
       email,
       bio,
@@ -100,7 +100,7 @@ const handleChangePassword = async () => {
   setPasswordError(null);
 
   try {
-    await axios.put(`http://localhost:5000/users/${user?._id}/password`, {
+    await axios.put(`http://localhost:5000/users/${user?.id}/password`, {
       currentPassword: passwordData.currentPassword,
       newPassword: passwordData.newPassword
     });

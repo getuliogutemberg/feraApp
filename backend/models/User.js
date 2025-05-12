@@ -14,6 +14,9 @@ const UserSchema = new mongoose.Schema({
   updateAt: { type: String, default: new Date },
   status: { type: String, default: '' },
   isActive: { type: Boolean, default: false },
-}, { timestamps: true });
+}, { 
+  schema:'app',
+  timestamps: true
+ });
 
 module.exports = mongoose.model("User", UserSchema);

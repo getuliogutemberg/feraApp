@@ -1,9 +1,20 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const GrupoMaterialSchema = new mongoose.Schema({
-  cod_item_material: Number,
-  cod_grupo: Number,
-  data_grupo: Date,
+const GrupoMaterial = sequelize.define('GrupoMaterial', {
+  cod_item_material: {
+    type: DataTypes.INTEGER
+  },
+  cod_grupo: {
+    type: DataTypes.INTEGER
+  },
+  data_grupo: {
+    type: DataTypes.DATE
+  }
+}, {
+  schema:'app',
+  tableName: 'grupo_material',
+  timestamps: false
 });
 
-module.exports = mongoose.model("grupo_material", GrupoMaterialSchema);
+module.exports = GrupoMaterial;

@@ -1,6 +1,7 @@
-require("dotenv").config({ path: '../.env' });
+require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
+const { Sequelize, where, Op } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -20,68 +21,208 @@ const msalClient = new ConfidentialClientApplication({
   },
 });
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log("Banco de dados conectado"))
-.catch((err) => console.log("Erro ao conectar ao banco de dados:", err));
- 
-const User = mongoose.model("User", new mongoose.Schema({
-  name: String,
-  email: String,
-  RG: String,
-  password: String,
-  category: String,
-  className: String,
-  refreshToken: String,
-  position: { type: [Number], default: [0, 0] },
-  customIcon: { type: String, default:'https://www.pngmart.com/files/22/User-Avatar-Profile-PNG-Isolated-Transparent.png' }, // <-- Adiciona o ícone personalizado do usuário
-  createAt: { type: String, default: new Date},
-  updateAt: { type: String, default: new Date},
-  status: { type: String, default: ''},
-  isActive: { type: Boolean, default: false },
-}, { timestamps: true }));
-
-const Route = mongoose.model("Route", new mongoose.Schema({
-  path: { type: String, required: true },
-  component: { type: String, required: true },
-  name: { type: String, required: true },
-  requiredRole: { type: [String], default: [] }, // Role de usuários que podem acessar
-  pageId: { type: String, required: false }, // Adiciona o pageId para Dashboards, se necessário
-  reportId: { type: String, required: false }, // Adiciona o pageId para Dashboards, se necessário
-  workspaceId: { type: String, required: false },
-  icon:{ type: String, required: false },
-
-}, { timestamps: true }));
-
-const Configuration = mongoose.model("Configuration", new mongoose.Schema({
-  notifications: { type: Boolean, default: true },
-  allowRegister: { type: Boolean, default: false },
-  allowRequireRegister: { type: Boolean, default: false },
-  allowNewCategory: { type: Boolean, default: false },
-  allowNewClassName: { type: Boolean, default: false },
-  addSecretKey: { type: Boolean, default: false },
-  addCategory: { type: Boolean, default: true },
-  fontFamily: { type: String, default: "Arial" },
-  pageTitle: { type: String, default: "Configurações" },
-  themeMode: { type: String, enum: ["light", "dark"], default: "light" },
-  primaryColor: { type: Number, default: 56 },
-  secondaryColor: { type: Number, default: 180 },
-  backgroundColor: { type: Number, default: 0 },
-  textColor: { type: Number, default: 0 },
-  pbiKeys: {
-    clientId: { type: String, default: "b918d10b-19f4-44c3-a58e-36e311e734ce" },
-    clientSecret: { type: String, default: "dmZ8Q~Nmgk-9wiaO2Wxe6qRc8TZI.MZ8ob3psaP5" },
-    authority: { type: String, default: "https://login.microsoftonline.com/80899d73-a5f2-4a53-b252-077af6003b36" },
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  logging: false, // set to console.log to see SQL queries
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
   },
-}, { timestamps: true }));
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
+});
+
+sequelize.authenticate()
+  .then(() => console.log("Banco de dados conectado"))
+  .catch((err) => console.log("Erro ao conectar ao banco de dados:", err));
+
+ 
+const User = sequelize.define("User", {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  RG: {
+    type: DataTypes.STRING
+  },
+  password:  {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  category: {
+    type: DataTypes.STRING
+  },
+  className: {
+    type: DataTypes.STRING
+  },
+  refreshToken: {
+    type: DataTypes.STRING
+  },
+  position:  {
+    type: DataTypes.ARRAY(DataTypes.FLOAT),
+    defaultValue: [0, 0]
+  },
+  customIcon: {
+    type: DataTypes.STRING,
+    defaultValue: 'https://www.pngmart.com/files/22/User-Avatar-Profile-PNG-Isolated-Transparent.png'
+  }, // <-- Adiciona o ícone personalizado do usuário
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: ''
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+}, { 
+  schema:'app',
+  timestamps: true
+ });
+
+const Route = sequelize.define("Route", {
+  path: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  component: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  requiredRole: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    defaultValue: []
+  },
+  pageId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  reportId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  workspaceId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
+}, {
+  schema: 'app',
+  timestamps: true
+})
+
+const Configuration = sequelize.define('Configuration', {
+  notifications: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  allowRegister: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  allowRequireRegister: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  allowNewCategory: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  allowNewClassName: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  addSecretKey: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  addCategory: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  fontFamily: {
+    type: DataTypes.STRING,
+    defaultValue: 'Arial'
+  },
+  pageTitle: {
+    type: DataTypes.STRING,
+    defaultValue: 'Configurações'
+  },
+  themeMode: {
+    type: DataTypes.ENUM('light', 'dark'),
+    defaultValue: 'light'
+  },
+  primaryColor: {
+    type: DataTypes.INTEGER,
+    defaultValue: 56
+  },
+  secondaryColor: {
+    type: DataTypes.INTEGER,
+    defaultValue: 180
+  },
+  backgroundColor: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  textColor: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  pbiKeys: {
+  type: DataTypes.JSONB,
+  defaultValue: {
+    clientId: 'b918d10b-19f4-44c3-a58e-36e311e734ce',
+    clientSecret: 'dmZ8Q~Nmgk-9wiaO2Wxe6qRc8TZI.MZ8ob3psaP5',
+    authority: 'https://login.microsoftonline.com/80899d73-a5f2-4a53-b252-077af6003b36'
+  }
+}
+}, {
+  schema:'app',
+timestamps: true
+})
 
 // Definição do modelo de Alerta
-const Alert = mongoose.model("Alerts", new mongoose.Schema({
-  type: String,
-  title: String,
-  description: String,
-  color: String,
-  icon: String,
-  deletedAt: { type: Date, default: null },
-}, { timestamps: true }));
+const Alert = sequelize.define('Alert', {
+  type: {
+    type: DataTypes.STRING
+  },
+  title: {
+    type: DataTypes.STRING
+  },
+  description: {
+    type: DataTypes.STRING
+  },
+  color: {
+    type: DataTypes.STRING
+  },
+  icon: {
+    type: DataTypes.STRING
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    defaultValue: null
+  }
+}, {
+  schema: 'app',
+  timestamps: true
+});
 
 
 
@@ -270,7 +411,7 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Todos os campos são obrigatórios!" });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email } });
     if (userExists) return res.status(400).json({ message: "Email já cadastrado!" });
     const newStatus = status === "cadastro" ? "" : "pedido de acesso"; 
     const isActive = status === "cadastro" ? true : false; 
@@ -293,7 +434,7 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Email e senha são obrigatórios!" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
     
     if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
 
@@ -348,15 +489,19 @@ app.post("/logout", verifyToken, async (req, res) => {
 app.get("/me", verifyToken, async (req, res) => {
   try {
     // Busca o usuário pelo id que vem do token
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findByPk(req.user.id);
    
     // Verifica se o usuário foi encontrado
     if (!user) {
       return res.status(404).json({ message: "Usuário não encontrado!" });
     }
 
+    // Remove o campo password manualmente
+    const userObj = user.get({ plain: true });
+    delete userObj.password;
+
     // Retorna o usuário sem a senha
-    res.json(user);
+    res.json(userObj);
   } catch (err) {
     console.error(err); // Registra o erro no console para depuração
 
@@ -383,7 +528,7 @@ app.get('/users', async (req, res) => {
       filter.category = category; // Aplica o filtro se className for informado
     }
 
-    let existingUsers = await User.find(filter);
+    let existingUsers = await User.findAll({ where: filter });
 
     if (existingUsers.length === 0) {
       const groups = ["A", "B", "C"];
@@ -401,7 +546,7 @@ app.get('/users', async (req, res) => {
       }
 
       // Recupera os usuários recém-criados com o filtro aplicado
-      existingUsers = await User.find(filter);
+      existingUsers = await User.findAll({ where: filter });
     }
 
     res.status(200).json(existingUsers);
@@ -429,7 +574,8 @@ app.post("/users", async (req, res) => {
 // Atualizar usuário
 app.put("/users/:id", async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    await User.update(req.body, { where: { id: req.params.id } });
+    const updatedUser = await User.findByPk(req.params.id);
     res.json(updatedUser);
   } catch (err) {
     res.status(500).json({ message: "Erro ao atualizar usuário" });
@@ -476,29 +622,20 @@ app.delete("/users/:id", async (req, res) => {
 app.get("/routes", async (req, res) => {
   try {
     // Verifica se já existem rotas no banco
-    const routes = await Route.find();
+    let routes = await Route.findAll();
 
     // Se não houver rotas, cria as rotas padrão
     if (routes.length === 0) {
       const defaultRoutes = [
-        // {
-        //   path: "/indicadores",
-        //   component: `<ProtectedRoute><DashPBI pageId="d7d35c6daec9e7e50737" /></ProtectedRoute>`,
-        //   requiredRole: ["admin", "user"], // Exemplo de roles que podem acessar
-        //   pageId: "d7d35c6daec9e7e50737"
-        // },
-        // {
-        //   path: "/gestão",
-        //   component: `<ProtectedRoute><DashPBI pageId="4582490ac83feb518640" /></ProtectedRoute>`,
-        //   requiredRole: ["admin", "manager"], // Exemplo de roles que podem acessar
-        //   pageId: "4582490ac83feb518640"
-        // }
+        // Adicione aqui as rotas padrão se necessário
       ];
 
       // Insere as rotas padrão no banco de dados
-      await Route.insertMany(defaultRoutes);
-      routes = await Route.find();
-      console.log("Rotas padrão inseridas com sucesso.");
+      if (defaultRoutes.length > 0) {
+        await Route.bulkCreate(defaultRoutes);
+        routes = await Route.findAll();
+        console.log("Rotas padrão inseridas com sucesso.");
+      }
       return res.status(200).json(routes); // Retorna as rotas padrão para o cliente
     }
 
@@ -523,7 +660,7 @@ app.post("/routes", async (req, res) => {
     }
 
     // Verifica se já existe uma rota com o mesmo path
-    const existingRoute = await Route.findOne({ path });
+    const existingRoute = await Route.findOne({ where: { path } });
     if (existingRoute) {
       return res.status(400).json({ 
         message: "Já existe uma rota com este path" 
@@ -572,8 +709,7 @@ app.put("/routes/:id", async (req, res) => {
 
     // Verifica se existe uma rota com o mesmo path (exceto a própria rota)
     const existingRoute = await Route.findOne({ 
-      path, 
-      _id: { $ne: routeId } 
+      where: { path, id: { [Op.ne]: routeId } }
     });
     
     if (existingRoute) {
@@ -583,8 +719,7 @@ app.put("/routes/:id", async (req, res) => {
     }
 
     // Atualiza a rota
-    const updatedRoute = await Route.findByIdAndUpdate(
-      routeId,
+    const updatedRoute = await Route.update(
       {
         path,
         component,
@@ -595,16 +730,17 @@ app.put("/routes/:id", async (req, res) => {
         workspaceId : workspaceId || "",
         icon : icon || ""
       },
-      { new: true } // Retorna o documento atualizado
+      { where: { id: routeId } }
     );
 
-    if (!updatedRoute) {
+    if (updatedRoute[0] === 0) {
       return res.status(404).json({ 
         message: "Rota não encontrada" 
       });
     }
 
-    res.json(updatedRoute);
+    const updatedRouteResult = await Route.findByPk(routeId);
+    res.json(updatedRouteResult);
 
   } catch (err) {
     console.error("Erro ao atualizar rota:", err);
@@ -619,7 +755,7 @@ app.put("/routes/:id", async (req, res) => {
 app.delete("/routes/:id", async (req, res) => {
   try {
     const routeId = req.params.id;
-    const deletedRoute = await Route.findByIdAndDelete(routeId);
+    const deletedRoute = await Route.findByPk(routeId);
 
     if (!deletedRoute) {
       return res.status(404).json({ 
@@ -627,6 +763,7 @@ app.delete("/routes/:id", async (req, res) => {
       });
     }
 
+    await deletedRoute.destroy();
     res.json({ 
       message: "Rota excluída com sucesso", 
       route: deletedRoute 
@@ -682,13 +819,13 @@ app.get("/configuration", async (req, res) => {
   try {
     const config = await Configuration.findOne();
     if (config) {
-      const { _id, createdAt, updatedAt, __v, ...filteredConfig } = config.toObject();
+      const filteredConfig = config.get({ plain: true });
       return res.json(filteredConfig);
     } else {
       // Se não houver configuração, cria uma nova com os valores padrão
       const newConfig = new Configuration();
       await newConfig.save();
-      const { _id, createdAt, updatedAt, __v, ...filteredNewConfig } = newConfig.toObject();
+      const filteredNewConfig = newConfig.get({ plain: true });
       return res.json(filteredNewConfig);
     }
   } catch (error) {
@@ -705,7 +842,7 @@ app.put("/configuration", async (req, res) => {
       return res.status(404).json({ message: "Configuração não encontrada" });
     }
 
-    const { _id, createdAt, updatedAt, __v, ...filteredConfig } = updatedConfig.toObject();
+    const filteredConfig = updatedConfig.get({ plain: true });
     res.json(filteredConfig);
   } catch (error) {
     console.error("Erro ao atualizar configurações:", error);

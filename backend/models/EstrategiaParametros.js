@@ -1,12 +1,29 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const EstrategiaParametrosSchema = new mongoose.Schema({
-  cod_grupo: Number,
-  cod_item_material: Number,
-  client: String,
-  cods_parametro: [Number],
-  cods_opcao: [Number],
-  data_estrategia: Date,
+const EstrategiaParametros = sequelize.define('EstrategiaParametros', {
+  cod_grupo: {
+    type: DataTypes.INTEGER
+  },
+  cod_item_material: {
+    type: DataTypes.INTEGER
+  },
+  client: {
+    type: DataTypes.STRING
+  },
+  cods_parametro: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER)
+  },
+  cods_opcao: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER)
+  },
+  data_estrategia: {
+    type: DataTypes.DATE
+  }
+}, {
+  schema:'app',
+  tableName: 'estrategia_parametros',
+  timestamps: false
 });
 
-module.exports = mongoose.model("estrategia_parametros", EstrategiaParametrosSchema);
+module.exports = EstrategiaParametros;

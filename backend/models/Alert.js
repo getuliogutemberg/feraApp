@@ -1,12 +1,29 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const AlertSchema = new mongoose.Schema({
-  type: String,
-  title: String,
-  description: String,
-  color: String,
-  icon: String,
-  deletedAt: { type: Date, default: null },
-}, { timestamps: true });
+const Alert = sequelize.define('Alert', {
+  type: {
+    type: DataTypes.STRING
+  },
+  title: {
+    type: DataTypes.STRING
+  },
+  description: {
+    type: DataTypes.STRING
+  },
+  color: {
+    type: DataTypes.STRING
+  },
+  icon: {
+    type: DataTypes.STRING
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    defaultValue: null
+  }
+}, {
+  schema:'app',
+  timestamps: true
+});
 
-module.exports = mongoose.model("Alert", AlertSchema);
+module.exports = Alert;

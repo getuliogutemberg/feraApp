@@ -12,9 +12,9 @@ const io = (server) => {
 
     socket.on("updatePosition", async ({ userId, position }) => {
       console.log("Usuário moveu:", userId, position);
-      await User.findByIdAndUpdate(userId, { position });
-      const allUsersPositions = await User.find();
-      const allPositions = await Position.find();
+      await User.update({ position }, { where: { id: userId } });
+      const allUsersPositions = await User.findAll();
+      const allPositions = await Position.findAll();
 
       // Broadcast para todos os usuários conectados
       io.emit("allPositions", [...allPositions, ...allUsersPositions]);

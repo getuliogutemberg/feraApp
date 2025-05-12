@@ -39,7 +39,7 @@ const register = async (req, res) => {
         return res.status(400).json({ message: "Email e senha são obrigatórios!" });
       }
   
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ where: { email } });
       
       if (!user) return res.status(400).json({ message: "Usuário não encontrado!" });
   

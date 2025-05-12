@@ -10,7 +10,7 @@ class MaterialController {
                 return res.status(400).json({ message: "O código do grupo é obrigatório." });
             }
 
-            const materiaisDoGrupo = await grupo_material.find({ cod_grupo: cod_grupo });
+            const materiaisDoGrupo = await grupo_material.findAll({ where: { cod_grupo: cod_grupo } });
 
             if (materiaisDoGrupo.length === 0) {
                 return res.status(404).json({ message: "Nenhum material encontrado para este grupo." });
@@ -18,7 +18,7 @@ class MaterialController {
 
             const codigosMateriais = materiaisDoGrupo.map(m => m.cod_item_material);
 
-            const materiais = await cadastro_material.find({ cod_item_material: { $in: codigosMateriais } });
+            const materiais = await cadastro_material.findAll({ where: { cod_item_material: codigosMateriais } });
 
             res.status(200).json(materiais);
         } catch (error) {
