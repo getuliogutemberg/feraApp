@@ -402,7 +402,7 @@ function App() {
             <Route path="/usuários" element={ <ProtectedRoute requiredRole={["ADMIN","OWNER"]}  >
               <Users />
             </ProtectedRoute>} /> 
-            <Route path="/módulos" element={ <ProtectedRoute requiredRole={["OWNER"]}  >
+            <Route path="/módulos" element={ <ProtectedRoute requiredRole={["OWNER","ADMIN"]}  >
               <RoutesEdit />
             </ProtectedRoute>} /> 
         <Route path="/administrador" element={ <ProtectedRoute requiredRole={["ADMIN","OWNER"]} >
