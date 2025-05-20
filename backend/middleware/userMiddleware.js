@@ -1,6 +1,4 @@
-
-const jwt = require("jsonwebtoken");
-
+// Middleware para verificar se o token é válido antes de prosseguir
 const generateUserByIndex = (index) => {
     const names = ["Ana", "Carlos", "Fernanda", "Ricardo", "Juliana", "Marcos", "Larissa", "Daniel", "Beatriz", "Felipe"];
     const surnames = ["Silva", "Santos", "Lima", "Alves", "Mendes", "Ferreira", "Gomes", "Rocha", "Pereira", "Castro"];
@@ -43,51 +41,13 @@ const generateUserByIndex = (index) => {
       updateAt: new Date(),
     };
   };
-  
-  // Função para gerar uma senha segura (você pode customizar conforme necessidade)
-  const generatePassword = () => {
-    return Math.random().toString(36).slice(-8); // Senha aleatória de 8 caracteres
-  };
-  
-  const generateUsers = (groupNames, tagNames) => {
-    const users = {};
-    let id = 1;
-  
-    // Itera sobre os grupos
-    for (const group of groupNames) {
-      users[group] = [];
-  
-      // Itera sobre as tags para cada grupo
-      for (const tag of tagNames) {
-        const user = generateUserByIndex(id); // Gera o usuário com índice
-        users[group].push({ ...user, id, RG: `${group}${tag}` }); // Adiciona RG e id único
-        id++;
-      }
-      users[group].reverse(); // Para ordenar de cima para baixo
-    }
-  
-    return users;
-  };
-  
-  
-  // Função para gerar tokens
-  const generateAccessToken = (user) => {
-    return jwt.sign(
-      { id: user._id, category: user.category, className: user.className },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
-  };
-  
-  const generateRefreshToken = (user) => {
-    return jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
-  };
 
-  // Exports
-  module.exports = {
+// Função para gerar uma senha segura (você pode customizar conforme necessidade)
+const generatePassword = () => {
+    return Math.random().toString(36).slice(-8); // Senha aleatória de 8 caracteres
+};
+
+module.exports = {
     generateUserByIndex,
     generatePassword,
-    generateUsers,
-    generateAccessToken,
-    generateRefreshToken,
-  };
+};

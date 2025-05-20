@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require("../config/database");
 
 const Alert = sequelize.define('Alert', {
   type: {
@@ -22,7 +22,7 @@ const Alert = sequelize.define('Alert', {
     defaultValue: null
   }
 }, {
-  schema:'internal',
+  schema: 'internal',
   timestamps: true
 });
 

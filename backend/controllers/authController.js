@@ -1,23 +1,17 @@
-const { stringify } = require("querystring");
-const { Server } = require("socket.io");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User'); 
+const { generateAccessToken, generateRefreshToken, } = require("../utils/tokenUtils");
 
-const { User } = require("../models/User");
-
-const {  
-  generateAccessToken,
-  generateRefreshToken, } = require("../utils/index");
-
-
-const register = async (req, res) => {
+class AuthController {
+  async register(req, res) {
     try {
       const { name, email, password, category, className,status } = req.body;
       if (!name || !email || !password || !category || !className) {
         return res.status(400).json({ message: "Todos os campos são obrigatórios!" });
       }
   
-      const userExists = await User.findOne({ email });
+      const userExists = await User.findOne({ where: { email } });
       if (userExists) return res.status(400).json({ message: "Email já cadastrado!" });
       const newStatus = status === "cadastro" ? "" : "pedido de acesso"; 
       const isActive = status === "cadastro" ? true : false; 
@@ -30,9 +24,9 @@ const register = async (req, res) => {
       res.status(500).json({ message: "Erro no servidor!", error: err.message });
     }
   }
-  
- const login = async (req, res) => {
-   
+
+  async login(req, res) {
+ 
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -50,17 +44,16 @@ const register = async (req, res) => {
       const refreshToken = generateRefreshToken(user);
   
       user.refreshToken = refreshToken;
+      // console.log(user)
       await user.save();
   
       res.json({ message: "Login bem-sucedido!", accessToken, refreshToken, route:'/',user });
     } catch (err) {
       res.status(500).json({ message: "Erro no servidor!", error: err.message });
     }
-  };
-  
-  
-  // Rota para renovar o token de acesso
- const refresh = async (req, res) => {
+  }
+
+  async refresh(req, res) {
     try {
       const { refreshToken } = req.body;
       if (!refreshToken) return res.status(401).json({ message: "Token de atualização obrigatório!" });
@@ -77,16 +70,47 @@ const register = async (req, res) => {
     } catch (err) {
       res.status(500).json({ message: "Erro no servidor!", error: err.message });
     }
-  };
-  
-  // Logout - Remove o refreshToken do usuário
-  const logout = async (req, res) => {
+  }
+
+  async logout(req, res) {
     try {
       await User.findByIdAndUpdate(req.user.id, { refreshToken: null });
       res.json({ message: "Logout bem-sucedido!" });
     } catch (err) {
       res.status(500).json({ message: "Erro no servidor!", error: err.message });
     }
-  };
+  }
 
-  module.exports = { register, login, refresh, logout };
+  async me(req, res) {
+    try {
+      // Busca o usuário pelo id que vem do token
+      const user = await User.findByPk(req.user.id);
+     
+      // Verifica se o usuário foi encontrado
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado!" });
+      }
+  
+      // Remove o campo password manualmente
+      const userObj = user.get({ plain: true });
+      delete userObj.password;
+  
+      // Retorna o usuário sem a senha
+      res.json(userObj);
+    } catch (err) {
+      console.error(err); // Registra o erro no console para depuração
+  
+      // Resposta de erro com status 500
+      res.status(500).json({
+        message: "Erro no servidor!",
+        error: err.message || "Erro desconhecido",
+      });
+    }
+  }
+
+  async admin(req, res) {
+    res.json({ message: "Acesso permitido ao administrador!" });
+  }
+}
+
+module.exports = new AuthController();
