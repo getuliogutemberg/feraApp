@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import User from '../models/User';
-import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
+import { generateAccessToken, generateRefreshToken, generateUserJWTSecret } from '../utils/tokenUtils';
 
 // Interface para o corpo da requisição de registro
 interface RegisterBody {
@@ -40,6 +40,7 @@ class AuthController {
       const newStatus = status === "cadastro" ? "" : "pedido de acesso";
       const isActive = status === "cadastro" ? true : false;
       const hashedPassword = await bcrypt.hash(password, 12);
+      const jwtSecret = generateUserJWTSecret();
       
       const newUser = await User.create({ 
         name, 
@@ -48,7 +49,8 @@ class AuthController {
         category, 
         className, 
         status: newStatus, 
-        isActive 
+        isActive,
+        jwtSecret
       });
 
       return res.status(201).json({ 
@@ -75,8 +77,8 @@ class AuthController {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Senha incorreta!" });
 
-      const accessToken = generateAccessToken(user);
-      const refreshToken = generateRefreshToken(user);
+      const accessToken = await generateAccessToken(user);
+      const refreshToken = await generateRefreshToken(user);
 
       await user.update({ refreshToken });
 
@@ -101,14 +103,18 @@ class AuthController {
       const user = await User.findOne({ where: { refreshToken } });
       if (!user) return res.status(403).json({ message: "Refresh Token inválido!" });
 
+      if (!user.jwtSecret) {
+        throw new Error("Usuário sem chave JWT específica");
+      }
+
       await new Promise((resolve, reject) => {
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err, _decoded) => {
+        jwt.verify(refreshToken, user.jwtSecret!, (err, _decoded) => {
           if (err) reject(new Error("Refresh Token expirado!"));
           resolve(true);
         });
       });
 
-      const newAccessToken = generateAccessToken(user);
+      const newAccessToken = await generateAccessToken(user);
       return res.json({ accessToken: newAccessToken });
     } catch (err) {
       const error = err as Error;

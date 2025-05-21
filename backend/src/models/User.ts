@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from "../config/database";
+import sequelize from "../../config/database";
 
 // Interface para as propriedades do User
 export interface UserAttributes {
@@ -11,6 +11,7 @@ export interface UserAttributes {
   category?: string | null;
   className?: string | null;
   refreshToken?: string | null;
+  jwtSecret?: string | null;
   position: [number, number];
   customIcon?: string;
   status?: string;
@@ -32,6 +33,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public category!: string | null;
   public className!: string | null;
   public refreshToken!: string | null;
+  public jwtSecret!: string | null;
   public position!: [number, number];
   public customIcon!: string;
   public status!: string;
@@ -65,6 +67,10 @@ User.init({
   },
   refreshToken: {
     type: DataTypes.STRING
+  },
+  jwtSecret: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
   position: {
     type: DataTypes.ARRAY(DataTypes.FLOAT),

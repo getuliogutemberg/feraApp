@@ -58,15 +58,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   }, []);
 
-  // Verifica login ao iniciar
-  useEffect(() => {
-    if (accessToken) {
-      api.get("/me")
-        .then(({ data }) => setUser(data))
-        .catch(() => logout());
-    }
-  }, [accessToken, logout]);
-
   // Login
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -79,6 +70,80 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Erro no login", axios.isAxiosError(err) ? err.response?.data?.message : err);
     }
   };
+
+  const refreshAccessToken = useCallback(async (): Promise<boolean> => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) return false;
+
+      const { data } = await axios.post("http://localhost:5000/refresh", { refreshToken });
+      setAccessToken(data.accessToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      return true;
+    } catch (err) {
+      await logout();
+      return false;
+    }
+  }, [logout]);
+
+  // Verifica token de acesso para login imediato
+  useEffect(() => {
+    const initializeAuth = async () => {
+      if (!accessToken) return;
+  
+      try {
+        await api.get("/me").then(({ data }) => setUser(data));
+      } catch (error) {
+        // Tenta renovar se o accessToken estiver expirado
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          try {
+            await api.get("/me").then(({ data }) => setUser(data));
+          } catch {
+            await logout();
+          }
+        }
+      }
+    };
+  
+    initializeAuth();
+  }, [accessToken, refreshAccessToken, logout]);
+
+  // Interceptor para tratar erros 401
+  useEffect(() => {
+    const requestInterceptor = api.interceptors.request.use(config => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    const responseInterceptor = api.interceptors.response.use(
+      response => response,
+      async error => {
+        const originalRequest = error.config;
+        
+        // Se erro for 401 e não foi tentado renovar ainda
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return api(originalRequest); // Repete a requisição original
+          }
+        }
+        
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.request.eject(requestInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, [refreshAccessToken]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, login, logout, accessToken }}>

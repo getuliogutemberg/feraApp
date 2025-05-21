@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 import express, { Express, Request, Response, NextFunction } from "express";
-import sequelize from "./config/database";
+import sequelize from "../config/database";
 import { verifyToken, verifyCategory } from "./middleware/authMiddleware";
 import cors from "cors";
 import http from "http";
@@ -93,9 +93,29 @@ app.put('/params/reset/material/:materialId', ParamsController.resetItem); // Ro
 
 const server: Server = http.createServer(app);
 
-server.listen(process.env.PORT || 5000, () => {
-  console.log("Servidor rodando na porta", process.env.PORT || 5000);
-});
+const startServer = async (port: number): Promise<void> => {
+  try {
+    await new Promise((resolve, reject) => {
+      server.listen(port, () => {
+        console.log("Servidor rodando na porta", port);
+        resolve(true);
+      }).on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          console.log(`Porta ${port} em uso, tentando porta ${port + 1}`);
+          resolve(startServer(port + 1));
+        } else {
+          reject(err);
+        }
+      });
+    });
+  } catch (err) {
+    console.error("Erro ao iniciar servidor:", err);
+    process.exit(1);
+  }
+};
 
 // Inicializa socket
 setupSocket(server);
+
+// Inicia o servidor
+startServer(Number(process.env.PORT) || 5000);

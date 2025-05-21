@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import User from '../models/User';
 
 // Interface para o payload do token JWT
 interface UserPayload {
@@ -18,13 +19,19 @@ declare global {
 }
 
 // Middleware para verificar token JWT
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ message: "Acesso negado!" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as UserPayload;
-    req.user = decoded;  // Define o usuário no request com os dados do token
+    const decoded = jwt.decode(token) as UserPayload;
+    if (!decoded?.id) throw new Error("Token inválido");
+
+    const user = await User.findByPk(decoded.id);
+    if (!user?.jwtSecret) throw new Error("Usuário não encontrado ou sem chave JWT específica");
+
+    const verified = jwt.verify(token, user.jwtSecret) as UserPayload;
+    req.user = verified;
     return next();
   } catch (err) {
     const error = err as Error;
