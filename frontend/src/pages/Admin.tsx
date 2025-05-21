@@ -124,7 +124,7 @@ export default function Admin() {
           </Fade>
         ))}
 
-{user?.className === "OWNER" && [
+{user?.className && ["OWNER", "ADMIN"].includes(user?.className) && [
            
            { title: "Módulos", icon: <TbPackages fontSize="large" />, color: deepPurple[500], path: "/módulos" },
            

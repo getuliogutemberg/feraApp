@@ -159,27 +159,66 @@ const Sidebar = () => {
             ].filter((router) => router.component === "Dashboard Power BI" ),
             "requiredRole": ["OWNER","ADMIN","CLIENT"]
           },
-          {
+          // {
+          //   id: "6",
+          //   "name": "Priorizações",
+          //   "icon": "chartColumn",
+          //   "component": 'MenuGroup',
+          //   "path": "/priorizações",
+          //   "subRoutes": [
+          //     ...routes.filter((route)=> ["Priorizações"].includes(route.name)).map((route) => ({
+          //       path: route.path,
+          //       icon: route.icon,
+          //       name: route.name,
+          //       component: route.component,
+          //       requiredRole: route.requiredRole, // <- antes tava errado aqui
+          //       pageId: route.pageId,
+          //       reportId: route.reportId,
+          //       workspaceId: route.workspaceId,
+          //     })),
+             
+             
+          //   ],
+          //   "requiredRole": ["OWNER","ADMIN","CLIENT"]
+          // },
+          ...routes
+          .filter((route) => route.name === "Priorizações")
+          .map((route) => ({
             id: "6",
-            "name": "Priorizações",
-            "icon": "chartColumn",
-            "component": 'MenuGroup',
-            "path": "/priorizações",
-            "subRoutes": [
-             
-             
-             
-            ],
-            "requiredRole": ["OWNER","ADMIN","CLIENT"]
-          },
-          ...(routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).length > 0 ? [{
+            path: route.path,
+            icon: route.icon,
+            name: route.name,
+            component: route.component,
+            requiredRole: route.requiredRole,
+            pageId: route.pageId ,
+            reportId: route.reportId,
+            workspaceId: route.workspaceId,
+            subRoutes: [],
+            // Add any other required MenuGroup fields here
+          })),
+          ...routes
+          .filter((route) => route.name === "FERA-2")
+          .map((route) => ({
             id: "7",
+            path: route.path,
+            icon: route.icon,
+            name: route.name,
+            component: route.component,
+            requiredRole: route.requiredRole,
+            pageId: route.pageId ,
+            reportId: route.reportId,
+            workspaceId: route.workspaceId,
+            subRoutes: [],
+            // Add any other required MenuGroup fields here
+          })),
+          ...(routes.filter((route)=> !["FERA-2","Priorizações","Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).length > 0 ? [{
+            id: "8",
             name: "",
             icon: "chartColumn", // ou outro ícone de sua escolha
             component: 'MenuGroup',
             path: "/menu",
             subRoutes: [
-              ...routes.filter((route)=> !["Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
+              ...routes.filter((route)=> !["FERA-2","Priorizações","Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
                 path: route.path,
                 icon: route.icon,
                 name: route.name,
@@ -326,7 +365,7 @@ const Sidebar = () => {
 
       <ul className="sidebar-options">
         {['ADMIN','OWNER'].includes(user.className) && <li title="Opcões"><Link to="/opções"><CircleEllipsis  /> <span>Opções</span></Link></li> }
-        {['OWNER'].includes(user.className) && <li title="Administrador"><Link to="/administrador"><Wallpaper  /><span>Administrador</span></Link></li>}
+        {['ADMIN','OWNER'].includes(user.className) && <li title="Administrador"><Link to="/administrador"><Wallpaper  /><span>Administrador</span></Link></li>}
         
 
         
