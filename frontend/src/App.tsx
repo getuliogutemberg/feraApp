@@ -21,6 +21,7 @@ import Estrategica from './pages/Estrategica.tsx';
 import socket from  'socket.io-client';
 import Users from './pages/Users.tsx';
 import RoutesEdit from './pages/RoutesEdit.tsx';
+import NavEdit from './pages/NavEdit.tsx';
 import axios from 'axios';
 import { Key, useEffect, useState } from 'react';
 import DashPBI from './pages/DashPBI.tsx';
@@ -94,188 +95,15 @@ function App() {
   const [settings, setSettings] = useState<Configuration | null>(null);
 
   useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/routes");
-        // setRoutes(response.data); // Atualiza o estado com os dados recebidos
-        return response.data
-      } catch (error) {
-        console.error("Erro ao buscar as rotas:", error);
-      }
-    };
-
     
     // Carregar os grupos de menu do backend
     const fetchMenuGroups = async () => {
-      const routes = await fetchRoutes() as SubRoute[];
+      
       try {
-        const response = routes &&  [
-          // {
-          //   id: "1",
-          //   name: "Teste",
-          //   icon: "parking",
-          //   path: "/test",
-          //   subRoutes: [],
-          //   requiredRole: ["OWNER"],
-          // },
-          {
-            id: "2",
-            "name": "Diagnóstico",
-            "icon": "chartLine",
-            "component": 'MenuGroup',
-            "path": "/diagnóstico",
-            "subRoutes": [
-              ...routes.filter((route)=> ["RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
-                path: route.path,
-                icon: route.icon,
-                name: route.name,
-                component: route.component,
-                requiredRole: route.requiredRole, // <- antes tava errado aqui
-                pageId: route.pageId,
-                reportId: route.reportId,
-                workspaceId: route.workspaceId,
-              })),
-             
-             
-            ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"]
-          },
-          {
-            id: "3",
-            "name": "Análise de Criticidade",
-            "icon": "listFilter",
-            "component": 'MenuGroup',
-            "path": "/criticidade",
-            "subRoutes": [
-              ...routes.filter((route)=> ["Interrupções","Energia não Distribuída","DEC/FEC"].includes(route.name)).map((route) => ({
-                path: route.path,
-                icon: route.icon,
-                name: route.name,
-                component: route.component,
-                requiredRole: route.requiredRole, // <- antes tava errado aqui
-                pageId: route.pageId,
-                reportId: route.reportId,
-                workspaceId: route.workspaceId,
-              })),
-             
-             
-            ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"]
-          },
-          ...routes
-          .filter((route) => route.name === "Ganho Agregado")
-          .map((route) => ({
-            id: "4",
-            path: route.path,
-            icon: route.icon,
-            name: route.name,
-            component: route.component,
-            requiredRole: route.requiredRole,
-            pageId: route.pageId ,
-            reportId: route.reportId,
-            workspaceId: route.workspaceId,
-            subRoutes: [],
-            // Add any other required MenuGroup fields here
-          })),
-          {
-            id: "5",
-            "name": "Projeções",
-            "icon": "listFilter",
-            "component": 'MenuGroup',
-            "path": "/projeções",
-            "subRoutes": [
-              ...routes.filter((route)=> ["Projeção de RUL","Projeção de Manutenção"].includes(route.name)).map((route) => ({
-                path: route.path,
-                icon: route.icon,
-                name: route.name,
-                component: route.component,
-                requiredRole: route.requiredRole, // <- antes tava errado aqui
-                pageId: route.pageId,
-                reportId: route.reportId,
-                workspaceId: route.workspaceId,
-              })),
-             
-             
-            ].filter((router) => router.component === "Dashboard Power BI" ),
-            "requiredRole": ["OWNER","ADMIN","CLIENT"]
-          },
-          // {
-          //   id: "6",
-          //   "name": "Priorizações",
-          //   "icon": "chartColumn",
-          //   "component": 'MenuGroup',
-          //   "path": "/priorizações",
-          //   "subRoutes": [
-          //     ...routes.filter((route)=> ["Priorizações"].includes(route.name)).map((route) => ({
-          //       path: route.path,
-          //       icon: route.icon,
-          //       name: route.name,
-          //       component: route.component,
-          //       requiredRole: route.requiredRole, // <- antes tava errado aqui
-          //       pageId: route.pageId,
-          //       reportId: route.reportId,
-          //       workspaceId: route.workspaceId,
-          //     })),
-             
-             
-          //   ],
-          //   "requiredRole": ["OWNER","ADMIN","CLIENT"]
-          // },
-          ...routes
-          .filter((route) => route.name === "Priorizações")
-          .map((route) => ({
-            id: "6",
-            path: route.path,
-            icon: route.icon,
-            name: route.name,
-            component: route.component,
-            requiredRole: route.requiredRole,
-            pageId: route.pageId ,
-            reportId: route.reportId,
-            workspaceId: route.workspaceId,
-            subRoutes: [],
-            // Add any other required MenuGroup fields here
-          })),
-          ...routes
-          .filter((route) => route.name === "FERA-2")
-          .map((route) => ({
-            id: "7",
-            path: route.path,
-            icon: route.icon,
-            name: route.name,
-            component: route.component,
-            requiredRole: route.requiredRole,
-            pageId: route.pageId ,
-            reportId: route.reportId,
-            workspaceId: route.workspaceId,
-            subRoutes: [],
-            // Add any other required MenuGroup fields here
-          })),
-          ...(routes.filter((route)=> !["FERA-2","Priorizações","Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).length > 0 ? [{
-            id: "8",
-            name: "",
-            icon: "chartColumn", // ou outro ícone de sua escolha
-            component: 'MenuGroup',
-            path: "/menu",
-            subRoutes: [
-              ...routes.filter((route)=> !["FERA-2","Priorizações","Projeção de RUL","Projeção de Manutenção","Interrupções","Energia não Distribuída","DEC/FEC","Ganho Agregado","RCP","CAPEX","Manutenção"].includes(route.name)).map((route) => ({
-                path: route.path,
-                icon: route.icon,
-                name: route.name,
-                component: route.component,
-                requiredRole: route.requiredRole, // <- antes tava errado aqui
-                pageId: route.pageId,
-                reportId: route.reportId,
-                workspaceId: route.workspaceId,
-              })),
-          ],
-            requiredRole: ["OWNER", "ADMIN", "CLIENT"]
-          }] : [])
+        const response = await axios.get<MenuGroup[]>("http://localhost:5000/menu-groups")
          
-         
-        ];
-        console.log(response)
-        setMenuGroups(response);
+        
+        setMenuGroups(response.data);
       } catch (error) {
         console.error('Erro ao carregar grupos de menu:', error);
       }
@@ -404,6 +232,9 @@ function App() {
             </ProtectedRoute>} /> 
             <Route path="/módulos" element={ <ProtectedRoute requiredRole={["OWNER","ADMIN"]}  >
               <RoutesEdit />
+            </ProtectedRoute>} /> 
+            <Route path="/navegação" element={ <ProtectedRoute requiredRole={["OWNER","ADMIN"]}  >
+              <NavEdit />
             </ProtectedRoute>} /> 
         <Route path="/administrador" element={ <ProtectedRoute requiredRole={["ADMIN","OWNER"]} >
               <Settings />
