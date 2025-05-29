@@ -1,5 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import { SnackbarProvider } from 'notistack';
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -28,6 +30,7 @@ import DashPBI from './pages/DashPBI.tsx';
 import RequireRegister from './pages/RequireRegister.tsx';
 import { PaletteMode } from '@mui/material';
 import Teste from './pages/Teste.tsx';
+import ThemeCustomization from './pages/ThemeCustomization.tsx';
 
 interface Configuration {
   notifications: boolean;
@@ -137,59 +140,60 @@ function App() {
   
   
   return (
-    <Router>
-      
-      <Navbar  />
-      <Sidebar />
-    
-     <Routes>
+    <SnackbarProvider maxSnack={3}>
+      <ThemeProvider>
+        <Router>
+          <Navbar  />
+          <Sidebar />
+        
+         <Routes>
 
-     {menuGroups.map((group) =>
-      group.subRoutes.map((sub) => (
-    <Route
-      key={group.id + sub.path}
-      path={group.path + sub.path}
-      element=
-        {sub.component === "Dashboard Power BI" ? 
-            <ProtectedRoute requiredRole={sub.requiredRole}>
-            <DashPBI pageId={sub.pageId || null } reportId={sub.reportId || null } workspaceId={sub.workspaceId || null } />
-            </ProtectedRoute>
-           : sub.component === "Gestão de Grupos e Materiais" ? 
-            <ProtectedRoute requiredRole={sub.requiredRole}>
-            <Estrategica />
-            </ProtectedRoute>
-           : sub.component === "Teste" ? 
-            <ProtectedRoute requiredRole={sub.requiredRole}>
-            <Teste />
-            </ProtectedRoute>
-           : 
-            <div>Componente não encontrado</div>
-
-          }
-      
-    />
-  ))
-)}
-
-
-{menuGroups.map((group) =>
-      
+         {menuGroups.map((group) =>
+          group.subRoutes.map((sub) => (
         <Route
-        key={group.id}
-        path={group.path}
-        element={
-          <ProtectedRoute requiredRole={group.requiredRole}  >
-            {group.component === "Dashboard Power BI" ? <DashPBI pageId={group.pageId || null} reportId={group.reportId  || null } workspaceId={group.workspaceId  || null} />:
-            group.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
-            group.component === "Teste" ? <Teste /> :
-             <></>
-            }
-          </ProtectedRoute>
-        }
-      />
-)}
-      
-   
+          key={group.id + sub.path}
+          path={group.path + sub.path}
+          element=
+            {sub.component === "Dashboard Power BI" ? 
+                <ProtectedRoute requiredRole={sub.requiredRole}>
+                <DashPBI pageId={sub.pageId || null } reportId={sub.reportId || null } workspaceId={sub.workspaceId || null } />
+                </ProtectedRoute>
+               : sub.component === "Gestão de Grupos e Materiais" ? 
+                <ProtectedRoute requiredRole={sub.requiredRole}>
+                <Estrategica />
+                </ProtectedRoute>
+               : sub.component === "Teste" ? 
+                <ProtectedRoute requiredRole={sub.requiredRole}>
+                <Teste />
+                </ProtectedRoute>
+               : 
+                <div>Componente não encontrado</div>
+
+              }
+          
+        />
+      ))
+    )}
+
+
+  {menuGroups.map((group) =>
+          
+          <Route
+          key={group.id}
+          path={group.path}
+          element={
+            <ProtectedRoute requiredRole={group.requiredRole}  >
+              {group.component === "Dashboard Power BI" ? <DashPBI pageId={group.pageId || null} reportId={group.reportId  || null } workspaceId={group.workspaceId  || null} />:
+              group.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
+              group.component === "Teste" ? <Teste /> :
+               <></>
+              }
+            </ProtectedRoute>
+          }
+        />
+    )}
+          
+       
 
 
 
@@ -241,8 +245,11 @@ function App() {
     
         </ProtectedRoute>} /> 
 
-        
-       
+        <Route path="/customização" element={
+          <ProtectedRoute requiredRole={["ADMIN", "OWNER"]}>
+            <ThemeCustomization />
+          </ProtectedRoute>
+        } />
 
         <Route path="/rota-restrita" element={ <Unauthorized/> } /> 
         <Route path="*" element={<NotFound />} />
@@ -250,8 +257,9 @@ function App() {
       </Routes>
       
     </Router>
-    
-  );
+  </ThemeProvider>
+</SnackbarProvider>
+);
 }
 
 export default App;

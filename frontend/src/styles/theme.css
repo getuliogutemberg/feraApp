@@ -1,0 +1,15 @@
+:root {
+  --font-family: var(--current-font-family, Arial);
+  --primary-color: var(--current-primary-color, #1F2A4C);
+  --secondary-color: var(--current-secondary-color, #f7801c);
+  --background-color: var(--current-background-color, #ffffff);
+  --text-color: var(--current-text-color, #000000);
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Add more global styles as needed */ 

@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 import './index.css'
 import App from './App.tsx'
 import { createTheme, ThemeProvider } from '@mui/material';
+import './styles/theme.css';
 
 
 
