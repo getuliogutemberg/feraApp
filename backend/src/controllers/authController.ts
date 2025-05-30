@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import User from '../models/User';
 import { generateAccessToken, generateRefreshToken, generateUserJWTSecret } from '../utils/tokenUtils';
+import emailService from '../services/emailService';
 
 // Interface para o corpo da requisição de registro
 interface RegisterBody {
@@ -23,6 +25,17 @@ interface LoginBody {
 // Interface para o corpo da requisição de refresh token
 interface RefreshBody {
   refreshToken: string;
+}
+
+// Interface para solicitação de recuperação de senha
+interface ForgotPasswordBody {
+  email: string;
+}
+
+// Interface para redefinição de senha
+interface ResetPasswordBody {
+  token: string;
+  newPassword: string;
 }
 
 class AuthController {
@@ -152,9 +165,113 @@ class AuthController {
       });
     }
   }
-
   async admin(_req: Request, res: Response) {
     return res.json({ message: "Acesso permitido ao administrador!" });
+  }
+
+  // Método para solicitar recuperação de senha
+  async forgotPassword(req: Request<{}, {}, ForgotPasswordBody>, res: Response) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email é obrigatório!" });
+      }
+
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        // Por segurança, não revelar se o email existe
+        return res.json({ message: "Se o email estiver cadastrado, você receberá instruções para recuperação." });
+      }      // Gerar token de recuperação
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
+
+      console.log('Gerando token de recuperação:', {
+        email,
+        token: resetToken,
+        expiry: resetTokenExpiry
+      });
+
+      // Salvar token no banco
+      await user.update({
+        resetPasswordToken: resetToken,
+        resetPasswordExpires: resetTokenExpiry
+      });
+
+      console.log('Token salvo no banco para usuário:', user.id);
+
+      // Enviar email
+      await emailService.sendPasswordResetEmail(email, resetToken);
+
+      return res.json({ 
+        message: "Se o email estiver cadastrado, você receberá instruções para recuperação." 
+      });
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao solicitar recuperação de senha:', error);
+      return res.status(500).json({ 
+        message: "Erro interno do servidor",
+        error: error.message 
+      });
+    }
+  }
+  // Método para redefinir senha
+  async resetPassword(req: Request<{}, {}, ResetPasswordBody>, res: Response) {
+    try {
+      const { token, newPassword } = req.body;
+
+      console.log('Reset password request:', { token: token ? 'presente' : 'ausente', newPassword: newPassword ? 'presente' : 'ausente' });      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token e nova senha são obrigatórios!" });
+      }
+
+      // Buscar usuário pelo token
+      console.log('Procurando usuário com token:', token);
+      const user = await User.findOne({
+        where: {
+          resetPasswordToken: token,
+          resetPasswordExpires: {
+            [require('sequelize').Op.gt]: new Date() // Token ainda válido
+          }
+        }
+      });
+
+      console.log('Usuário encontrado:', user ? `ID: ${user.id}` : 'Nenhum');
+
+      if (!user) {
+        // Verificar se existe usuário com o token mas expirado
+        const expiredUser = await User.findOne({
+          where: { resetPasswordToken: token }
+        });
+        
+        if (expiredUser) {
+          console.log('Token encontrado mas expirado para usuário:', expiredUser.id);
+          return res.status(400).json({ message: "Token expirado!" });
+        } else {
+          console.log('Token não encontrado no banco de dados');
+          return res.status(400).json({ message: "Token inválido!" });
+        }
+      }
+
+      // Hash da nova senha
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      // Atualizar senha e limpar tokens de recuperação
+      await user.update({
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        refreshToken: null // Invalidar sessões existentes
+      });
+
+      return res.json({ message: "Senha redefinida com sucesso!" });
+    } catch (err) {
+      const error = err as Error;
+      console.error('Erro ao redefinir senha:', error);
+      return res.status(500).json({ 
+        message: "Erro interno do servidor",
+        error: error.message 
+      });
+    }
   }
 }
 

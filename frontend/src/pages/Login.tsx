@@ -442,9 +442,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-              />
-
-              <Button
+              />              <Button
                 type="submit"
                 variant="contained"
                 fullWidth
@@ -469,6 +467,25 @@ export default function Login() {
               >
                 {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Entrar"}
               </Button>
+
+              <Box sx={{ mt: 2, textAlign: "center" }}>
+                <Button
+                  variant="text"
+                  onClick={() => navigate("/esqueci-senha")}
+                  sx={{
+                    color: "#f27911",
+                    textTransform: "none",
+                    textDecoration: "underline",
+                    fontSize: "0.9rem",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  Esqueci minha senha
+                </Button>
+              </Box>
             </Box>
           </motion.div>
 

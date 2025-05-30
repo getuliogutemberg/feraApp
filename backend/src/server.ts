@@ -50,6 +50,8 @@ app.post("/register", AuthController.register); // Rota de registro
 app.post("/login", AuthController.login); // Rota de login
 app.post("/refresh", AuthController.refresh); // Rota para renovar o token de acesso
 app.post("/logout", verifyToken, AuthController.logout); // Logout - Remove o refreshToken do usuário
+app.post("/forgot-password", AuthController.forgotPassword); // Solicitar recuperação de senha
+app.post("/reset-password", AuthController.resetPassword); // Redefinir senha
 app.get("/me", verifyToken, AuthController.me); // Rota protegida de exemplo
 app.get("/admin", verifyToken, verifyCategory("admin"), AuthController.admin); // Rota exclusiva para administradores
 
