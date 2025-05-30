@@ -9,6 +9,7 @@ import { Server } from "http";
 import AuthController from "./controllers/authController";
 import UserController from "./controllers/userController";
 import RouteController from "./controllers/routeController";
+import MenuController from "./controllers/menuController";
 import PBIController from "./controllers/pbiController";
 import ConfigurationController from "./controllers/configurationController";
 import AlertController from "./controllers/alertController";
@@ -67,6 +68,13 @@ app.get("/routes", RouteController.getRoutes); // Endpoint para obter as rotas
 app.post("/routes", RouteController.createRoute); // Rota POST para criar novas rotas
 app.put("/routes/:id", RouteController.updateRoute); // Rota PUT para atualizar rotas existentes
 app.delete("/routes/:id", RouteController.deleteRoute); // Rota DELETE para excluir rotas
+
+// Rota de Menus
+app.get("/menu-groups",MenuController.getMenus)
+app.post("/menu-groups",MenuController.createMenu)
+// app.put("/menu-groups", MenuController.updateMenu)
+// app.delete("/menu-groups", MenuController.deleteMenu)
+
 
 // Rota de PBI Token
 app.get("/getPBIToken/:pageId/:reportId/:workspaceId", PBIController.getPBIToken);
