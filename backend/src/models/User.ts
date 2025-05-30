@@ -12,6 +12,8 @@ export interface UserAttributes {
   className?: string | null;
   refreshToken?: string | null;
   jwtSecret?: string | null;
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
   position: [number, number];
   customIcon?: string;
   status?: string;
@@ -34,6 +36,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public className!: string | null;
   public refreshToken!: string | null;
   public jwtSecret!: string | null;
+  public resetPasswordToken!: string | null;
+  public resetPasswordExpires!: Date | null;
   public position!: [number, number];
   public customIcon!: string;
   public status!: string;
@@ -67,9 +71,16 @@ User.init({
   },
   refreshToken: {
     type: DataTypes.STRING
-  },
-  jwtSecret: {
+  },  jwtSecret: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  resetPasswordExpires: {
+    type: DataTypes.DATE,
     allowNull: true
   },
   position: {
