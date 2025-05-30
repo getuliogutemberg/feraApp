@@ -186,19 +186,11 @@ class AuthController {
       const resetToken = crypto.randomBytes(32).toString('hex');
       const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora
 
-      console.log('Gerando token de recuperação:', {
-        email,
-        token: resetToken,
-        expiry: resetTokenExpiry
-      });
-
       // Salvar token no banco
       await user.update({
         resetPasswordToken: resetToken,
         resetPasswordExpires: resetTokenExpiry
       });
-
-      console.log('Token salvo no banco para usuário:', user.id);
 
       // Enviar email
       await emailService.sendPasswordResetEmail(email, resetToken);
@@ -218,14 +210,13 @@ class AuthController {
   // Método para redefinir senha
   async resetPassword(req: Request<{}, {}, ResetPasswordBody>, res: Response) {
     try {
-      const { token, newPassword } = req.body;
-
-      console.log('Reset password request:', { token: token ? 'presente' : 'ausente', newPassword: newPassword ? 'presente' : 'ausente' });      if (!token || !newPassword) {
+      const { token, newPassword } = req.body;    
+      
+      if (!token || !newPassword) {
         return res.status(400).json({ message: "Token e nova senha são obrigatórios!" });
       }
 
       // Buscar usuário pelo token
-      console.log('Procurando usuário com token:', token);
       const user = await User.findOne({
         where: {
           resetPasswordToken: token,
@@ -235,8 +226,6 @@ class AuthController {
         }
       });
 
-      console.log('Usuário encontrado:', user ? `ID: ${user.id}` : 'Nenhum');
-
       if (!user) {
         // Verificar se existe usuário com o token mas expirado
         const expiredUser = await User.findOne({
@@ -244,10 +233,8 @@ class AuthController {
         });
         
         if (expiredUser) {
-          console.log('Token encontrado mas expirado para usuário:', expiredUser.id);
           return res.status(400).json({ message: "Token expirado!" });
         } else {
-          console.log('Token não encontrado no banco de dados');
           return res.status(400).json({ message: "Token inválido!" });
         }
       }

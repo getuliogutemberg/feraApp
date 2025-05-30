@@ -21,14 +21,18 @@ export default function ForgotPassword() {
       setError("Email é obrigatório!");
       setLoading(false);
       return;
-    }
-
-    try {
+    }    try {
       const response = await axios.post("http://localhost:5000/forgot-password", {
         email
       });
       
       setMessage(response.data.message);
+      
+      // Limpar a mensagem após 5 segundos
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+      
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Erro inesperado. Tente novamente.");
@@ -184,18 +188,22 @@ export default function ForgotPassword() {
                 </Button>
               </Box>
             </Box>
-          </motion.div>
-
+          </motion.div>          
           {error && (
             <Alert
               severity="error"
               sx={{
-                position: "absolute",
-                top: "0px",
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 backgroundColor: "#ffcccb",
                 borderRadius: "5px",
                 color: "#000",
                 transition: "all 0.5s ease-out",
+                zIndex: 9999,
+                minWidth: "300px",
+                maxWidth: "500px",
               }}
             >
               {error}
@@ -206,12 +214,17 @@ export default function ForgotPassword() {
             <Alert
               severity="success"
               sx={{
-                position: "absolute",
-                top: "0px",
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 backgroundColor: "#d4edda",
                 borderRadius: "5px",
                 color: "#000",
                 transition: "all 0.5s ease-out",
+                zIndex: 9999,
+                minWidth: "300px",
+                maxWidth: "500px",
               }}
             >
               {message}
