@@ -227,18 +227,22 @@ export default function ResetPassword() {
                 </Button>
               </Box>
             </Box>
-          </motion.div>
-
+          </motion.div>          
           {error && (
             <Alert
               severity="error"
               sx={{
-                position: "absolute",
-                top: "0px",
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 backgroundColor: "#ffcccb",
                 borderRadius: "5px",
                 color: "#000",
                 transition: "all 0.5s ease-out",
+                zIndex: 9999,
+                minWidth: "300px",
+                maxWidth: "500px",
               }}
             >
               {error}
@@ -249,12 +253,17 @@ export default function ResetPassword() {
             <Alert
               severity="success"
               sx={{
-                position: "absolute",
-                top: "0px",
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 backgroundColor: "#d4edda",
                 borderRadius: "5px",
                 color: "#000",
                 transition: "all 0.5s ease-out",
+                zIndex: 9999,
+                minWidth: "300px",
+                maxWidth: "500px",
               }}
             >
               {message}
