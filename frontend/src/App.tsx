@@ -19,7 +19,7 @@ import Profile from './pages/Profile.tsx';
 import Register from './pages/Register.tsx'; 
 import Settings from './pages/Settings';
 import Unauthorized from './pages/Unauthorized.tsx';
-import Estrategica from './pages/Estrategica.tsx';
+
 import socket from  'socket.io-client';
 import Users from './pages/Users.tsx';
 import RoutesEdit from './pages/RoutesEdit.tsx';
@@ -27,12 +27,15 @@ import NavEdit from './pages/NavEdit.tsx';
 import axios from 'axios';
 import { Key, useEffect, useState } from 'react';
 import DashPBI from './pages/DashPBI.tsx';
+import PesosAHP from './pages/PesosAHP.tsx';
 import RequireRegister from './pages/RequireRegister.tsx';
 import { PaletteMode } from '@mui/material';
-import Teste from './pages/Teste.tsx';
+
 import ThemeCustomization from './pages/ThemeCustomization.tsx';
 import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
+import NiveldeObs from './pages/NiveldeObs.tsx';
+import CustoHxH from './pages/CustoHxH.tsx';
 
 interface Configuration {
   notifications: boolean;
@@ -160,13 +163,17 @@ function App() {
                 <ProtectedRoute requiredRole={sub.requiredRole}>
                 <DashPBI pageId={sub.pageId || null } reportId={sub.reportId || null } workspaceId={sub.workspaceId || null } />
                 </ProtectedRoute>
-               : sub.component === "Gestão de Grupos e Materiais" ? 
+               : sub.component === "Pesos AHP" ?
                 <ProtectedRoute requiredRole={sub.requiredRole}>
-                <Estrategica />
+                <PesosAHP />
                 </ProtectedRoute>
-               : sub.component === "Teste" ? 
+               : sub.component === "Nivel de Obsolecencia" ? 
                 <ProtectedRoute requiredRole={sub.requiredRole}>
-                <Teste />
+                <NiveldeObs />
+                </ProtectedRoute>
+               : sub.component === "Custo HxH" ? 
+                <ProtectedRoute requiredRole={sub.requiredRole}>
+                <CustoHxH />
                 </ProtectedRoute>
                : 
                 <div>Componente não encontrado</div>
@@ -186,8 +193,11 @@ function App() {
           element={
             <ProtectedRoute requiredRole={group.requiredRole}  >
               {group.component === "Dashboard Power BI" ? <DashPBI pageId={group.pageId || null} reportId={group.reportId  || null } workspaceId={group.workspaceId  || null} />:
-              group.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
-              group.component === "Teste" ? <Teste /> :
+              // group.component === "Gestão de Grupos e Materiais" ? <Estrategica /> :
+              group.component === "Pesos AHP" ? <PesosAHP /> :
+              group.component === "Nivel de Obsolecencia" ? <NiveldeObs /> :
+              group.component === "Custo HxH" ? <CustoHxH /> :
+              // group.component === "Teste" ? <Teste /> :
                <></>
               }
             </ProtectedRoute>

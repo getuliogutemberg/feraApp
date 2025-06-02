@@ -48,8 +48,9 @@ const getIcon = (iconName: string) => {
   }
 };
 
-const componentes = ["Dashboard Power BI", "Gestão de Grupos e Materiais", "Teste"];
+const componentes = ["Dashboard Power BI", "Pesos AHP", "Nivel de Obsolecencia", "Custo HxH"];
 const categorias = ["OWNER", "ADMIN", "CLIENT"];
+
 
 type Route = {
   id: string;
@@ -270,8 +271,14 @@ const RoutesEdit = () => {
               <MenuItem key={opt} value={opt}>{opt}</MenuItem>
             ))}
           </Select>
-
-          <Select
+          {form.component === "Dashboard Power BI" &&  <>
+          <TextField label="Workspace ID" value={form.workspaceId} onChange={e => setForm({ ...form, workspaceId: e.target.value })} />
+          <TextField label="Page ID" value={form.pageId} onChange={e => setForm({ ...form, pageId: e.target.value })} />
+          <TextField label="Report ID" value={form.reportId} onChange={e => setForm({ ...form, reportId: e.target.value })} />
+        </>}
+       
+           
+              <Select
             multiple
             value={form.requiredRole || []}
             onChange={(e) => setForm({ ...form, requiredRole: e.target.value as string[] })}
@@ -286,12 +293,9 @@ const RoutesEdit = () => {
             {categorias.map(cat => (
               <MenuItem key={cat} value={cat}>{cat}</MenuItem>
             ))}
-          </Select>
-
-          <TextField label="Workspace ID" value={form.workspaceId} onChange={e => setForm({ ...form, workspaceId: e.target.value })} />
-          <TextField label="Page ID" value={form.pageId} onChange={e => setForm({ ...form, pageId: e.target.value })} />
-          <TextField label="Report ID" value={form.reportId} onChange={e => setForm({ ...form, reportId: e.target.value })} />
-        </DialogContent>
+          </Select> 
+        
+          </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseForm}>Cancelar</Button>
           <Button variant="contained" onClick={handleSave} sx={{

@@ -1,0 +1,229 @@
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Typography,
+  Box,
+  TextField,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Grid,
+  Button,
+  MenuItem,
+  Select,
+  Pagination
+} from "@mui/material";
+import { motion } from "framer-motion";
+
+// Interface para o tipo de dado
+interface CustoHxHItem {
+  id: number;
+  ano: number;
+  tuc: number;
+  custo: number;
+}
+
+// Dados de exemplo para a tabela de Custo HxH (mantido para fallback em caso de erro, mas comentado)
+// const dadosCusto: CustoHxHItem[] = [
+//   { id: 1, ano: 2016, tuc: 220, custo: 100 },
+//   { id: 2, ano: 2016, tuc: 205, custo: 100 },
+//   { id: 3, ano: 2016, tuc: 270, custo: 100 },
+//   { id: 4, ano: 2016, tuc: 445, custo: 100 },
+//   { id: 5, ano: 2016, tuc: 405, custo: 100 },
+// ];
+
+const anos = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]; // Manter anos para o Select de filtro
+
+export default function CustoHxH() {
+  const [filtros, setFiltros] = useState({ ano: '', tuc: '' });
+  const [dadosOriginais, setDadosOriginais] = useState<CustoHxHItem[]>([]); // Dados da API (apenas a página atual)
+  const [totalItems, setTotalItems] = useState(0); // Total de itens no backend
+  const [currentPage, setCurrentPage] = useState(1); // Página atual
+  const [itemsPerPage] = useState(10); // Quantidade de itens por página (fixo por enquanto)
+  const [dadosFiltrados, setDadosFiltrados] = useState<CustoHxHItem[]>([]); // Dados filtrados localmente (da página atual)
+
+  // Função para buscar dados com paginação e filtros (os filtros serão aplicados no backend futuramente)
+  
+
+  // Função para aplicar filtro localmente na página atual
+  const applyLocalFilter = (dataToFilter: CustoHxHItem[], currentFilters: { ano: string, tuc: string }) => {
+    const filtered = dataToFilter.filter(item =>
+        (currentFilters.ano === '' || String(item.ano) === String(currentFilters.ano)) &&
+        (currentFilters.tuc === '' || String(item.tuc).includes(currentFilters.tuc))
+    );
+    setDadosFiltrados(filtered);
+  };
+
+  // useEffect para buscar dados ao montar o componente ou mudar a página/limite
+  useEffect(() => {
+    const fetchData = async (page: number, limit: number, currentFilters: { ano: string, tuc: string }) => {
+        const offset = (page - 1) * limit;
+        // Note: Atualmente os filtros não são enviados para o backend. A filtragem ocorre no frontend sobre a página atual.
+        // Para otimizar, os filtros deveriam ser enviados na URL do fetch.
+        const url = `http://localhost:5000/equipamentos-manut/custohxh?limit=${limit}&offset=${offset}`;
+    
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+    
+          // Adicionar IDs aos dados se necessário (a API atual não retorna ID)
+          const dataWithIds = result.items.map((item: CustoHxHItem, index: number) => ({ ...item, id: item.id || offset + index + 1 }));
+    
+          setDadosOriginais(dataWithIds);
+          setTotalItems(result.totalItems);
+          // Aplicar filtro local inicialmente
+          applyLocalFilter(dataWithIds, currentFilters);
+    
+        } catch (error) {
+          console.error("Erro ao buscar dados de Custo HxH:", error);
+          // Em caso de erro, limpar dados ou exibir mensagem apropriada
+          setDadosOriginais([]);
+          setDadosFiltrados([]);
+          setTotalItems(0);
+          // Opcional: usar dados mockados em caso de erro
+          // setDadosOriginais(dadosCusto);
+          // setDadosFiltrados(dadosCusto);
+          // setTotalItems(dadosCusto.length); // Se usar mock, ajuste o total
+        }
+      };
+    fetchData(currentPage, itemsPerPage, filtros);
+  }, [currentPage, itemsPerPage, filtros]); // Dependências: busca novamente ao mudar a página ou limite
+
+  // useEffect para aplicar filtro localmente quando os filtros mudam ou os dados da página chegam
+  useEffect(() => {
+    applyLocalFilter(dadosOriginais, filtros);
+  }, [filtros, dadosOriginais]); // Dependências: aplica filtro ao mudar filtros ou dados da página
+
+  // Função para lidar com a mudança de página
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        px: 2,
+        ml: "80px",
+        // background: "rgba(16, 28, 68, 1)",
+        width: "calc(100vw - 110px)",
+        height: "calc(100vh - 70px)",
+        mt: "60px",
+        pt: 3,
+        gap: 2,
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', mb: 1,position: 'absolute',right: '40px', top: '100px' }}>
+        {/* <Box>
+          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#222" }}>
+            Administração <span style={{ color: "#888", fontWeight: 400 }}>/ Custo HxH</span>
+          </Typography>
+        </Box> */}
+        <Button
+          variant="contained"
+          sx={{ background: "#FF8C2A", color: "#fff", fontWeight: 600, borderRadius: 2, px: 3 }}
+        >
+          ● Adicionar Custo HxH
+        </Button>
+      </Box>
+
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+        <Card sx={{ p: 2, mb: 2, backgroundColor: "#fff" }}>
+          <Typography variant="subtitle1" sx={{ color: "#222", mb: 2, fontWeight: 600 }}>
+            <span role="img" aria-label="lamp"></span> Listagem de Custo HxH
+          </Typography>
+          <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+            <Grid item xs={12} md={3}>
+              <Select
+                fullWidth
+                value={filtros.ano}
+                onChange={(e) => setFiltros({ ...filtros, ano: e.target.value })}
+                displayEmpty
+                variant="outlined"
+                size="small"
+              >
+                <MenuItem value="">Ano</MenuItem>
+                {anos.map((ano) => (
+                  <MenuItem key={ano} value={ano}>{ano}</MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                label="TUC"
+                value={filtros.tuc}
+                onChange={(e) => setFiltros({ ...filtros, tuc: e.target.value })}
+                variant="outlined"
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Button
+                variant="contained"
+                sx={{ background: "#FF8C2A", color: "#fff", height: "40px" }}
+                // Ao clicar em procurar, re-busca os dados da primeira página com os filtros atuais
+                onClick={() => setCurrentPage(1)} 
+              >
+                Procurar
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 700 }}>Ano</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>TUC</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Custo</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {dadosFiltrados.map((item: CustoHxHItem) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.ano}</TableCell>
+                  <TableCell>{item.tuc}</TableCell>
+                  <TableCell>{item.custo}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{ background: "#888", color: "#fff", fontWeight: 600, mr: 1 }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{ background: "#FF8C2A", color: "#fff", fontWeight: 600 }}
+                    >
+                      Excluir
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* Componente de Paginação */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+             <Pagination
+                count={Math.ceil(totalItems / itemsPerPage)} // Total de páginas
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary" // Altere a cor conforme necessário
+                 sx={{ '.MuiPaginationItem-root': { color: '#fff', bgcolor: '#444' }, '.MuiPaginationItem-root.Mui-selected': { backgroundColor: '#FF8C2A', color: '#fff' } }} // Estilo básico
+             />
+          </Box>
+        </Card>
+      </motion.div>
+    </Box>
+  );
+} 

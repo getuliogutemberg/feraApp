@@ -17,6 +17,7 @@ import GroupDictionaryController from "./controllers/groupDictionaryController";
 import MaterialsController from "./controllers/materialsController";
 import ParamsController from "./controllers/paramsController"; 
 import { setupSocket } from "./socket";
+import equipamentoManutRoutes from './routes/equipamentoManut';
 
 sequelize.authenticate()
   .then(() => console.log("Banco de dados conectado"))
@@ -100,6 +101,8 @@ app.put('/params/group/:groupId', ParamsController.updateGroupParams); // Rota p
 app.put('/params/material/:materialId', ParamsController.updateMaterialParams); // Rota para listar todos os parâmetros de um grupo
 app.put('/params/reset/group/:groupId', ParamsController.resetGroupItems); // Rota restaurão padrão de estrategia de todos os itens de um grupo
 app.put('/params/reset/material/:materialId', ParamsController.resetItem); // Rota restaurar padrão de estrategia de um item de um grupo
+
+app.use('/equipamentos-manut', equipamentoManutRoutes);
 
 const server: Server = http.createServer(app);
 
