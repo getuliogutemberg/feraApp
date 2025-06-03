@@ -32,7 +32,7 @@ export const msalClient = new ConfidentialClientApplication({
   auth: {
     clientId: process.env.AZURE_APP_ID as string,
     clientSecret: process.env.AZURE_APP_SECRET as string,
-    authority: "https://login.microsoftonline.com/80899d73-a5f2-4a53-b252-077af6003b36",
+    authority: "https://login.microsoftonline.com/"+ process.env.AZURE_APP_TENANTID as string,
   },
 });
 
