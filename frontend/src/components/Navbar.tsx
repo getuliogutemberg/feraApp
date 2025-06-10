@@ -41,7 +41,7 @@ const Navbar = () => {
    
 
       
-    if (["/login","/registro","/solicitar-registro"].includes(location.pathname)) {
+    if (["/login","/registro","/solicitar-registro","/esqueci-senha"].includes(location.pathname)) {
         return null;
     }
 

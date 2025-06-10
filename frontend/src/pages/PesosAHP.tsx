@@ -11,7 +11,13 @@ import {
   TableCell,
   Grid,
   Button,
-  Pagination
+  Pagination,
+
+  Backdrop,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -76,37 +82,11 @@ export default function PesosAHP() {
   const [currentPage, setCurrentPage] = useState(1); // Página atual
   const [itemsPerPage] = useState(10); // Quantidade de itens por página (fixo por enquanto)
   const [dadosFiltrados, setDadosFiltrados] = useState<PesoAHPItem[]>([]); // Dados filtrados localmente (da página atual)
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar a abertura/fechamento do modal
+  const [currentAHPItem, setCurrentAHPItem] = useState<PesoAHPItem | null>(null); // Armazena o item sendo editado
 
   // Função para buscar dados com paginação e filtros (os filtros serão aplicados no backend futuramente)
-  const fetchData = async (page: number, limit: number, currentFilters: { parametro1: string, parametro2: string, nivel: string }) => {
-    const offset = (page - 1) * limit;
-    // Note: Atualmente os filtros não são enviados para o backend. A filtragem ocorre no frontend sobre a página atual.
-    // Para otimizar, os filtros deveriam ser enviados na URL do fetch.
-    const url = `http://localhost:5000/equipamentos-manut/pesosahp?limit=${limit}&offset=${offset}`;
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      
-      // Adicionar IDs aos dados se necessário (a API atual não retorna ID)
-      const dataWithIds = result.items.map((item: PesoAHPItem, index: number) => ({ ...item, id: item.id || offset + index + 1 }));
-      
-      setDadosOriginais(dataWithIds);
-      setTotalItems(result.totalItems);
-      // Aplicar filtro local inicialmente
-      applyLocalFilter(dataWithIds, currentFilters);
-
-    } catch (error) {
-      console.error("Erro ao buscar dados de Pesos AHP:", error);
-      // Em caso de erro, limpar dados ou exibir mensagem apropriada
-      setDadosOriginais([]);
-      setDadosFiltrados([]);
-      setTotalItems(0);
-    }
-  };
+  
 
   // Função para aplicar filtro localmente na página atual
   const applyLocalFilter = (dataToFilter: PesoAHPItem[], currentFilters: { parametro1: string, parametro2: string, nivel: string }) => {
@@ -120,8 +100,37 @@ export default function PesosAHP() {
 
   // useEffect para buscar dados ao montar o componente ou mudar a página/limite
   useEffect(() => {
+    const fetchData = async (page: number, limit: number, currentFilters: { parametro1: string, parametro2: string, nivel: string }) => {
+      const offset = (page - 1) * limit;
+      // Note: Atualmente os filtros não são enviados para o backend. A filtragem ocorre no frontend sobre a página atual.
+      // Para otimizar, os filtros deveriam ser enviados na URL do fetch.
+      const url = `http://localhost:5000/equipamentos-manut/pesosahp?limit=${limit}&offset=${offset}`;
+      
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        
+        // Adicionar IDs aos dados se necessário (a API atual não retorna ID)
+        const dataWithIds = result.items.map((item: PesoAHPItem, index: number) => ({ ...item, id: item.id || offset + index + 1 }));
+        
+        setDadosOriginais(dataWithIds);
+        setTotalItems(result.totalItems);
+        // Aplicar filtro local inicialmente
+        applyLocalFilter(dataWithIds, currentFilters);
+  
+      } catch (error) {
+        console.error("Erro ao buscar dados de Pesos AHP:", error);
+        // Em caso de erro, limpar dados ou exibir mensagem apropriada
+        setDadosOriginais([]);
+        setDadosFiltrados([]);
+        setTotalItems(0);
+      }
+    };
     fetchData(currentPage, itemsPerPage, filtros);
-  }, [currentPage, itemsPerPage]); // Dependências: busca novamente ao mudar a página ou limite
+  }, [currentPage, filtros, itemsPerPage]); // Dependências: busca novamente ao mudar a página ou limite
 
   // useEffect para aplicar filtro localmente quando os filtros mudam ou os dados da página chegam
   useEffect(() => {
@@ -131,6 +140,80 @@ export default function PesosAHP() {
   // Função para lidar com a mudança de página
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
+  };
+
+  // Função para abrir o modal
+  const handleOpenModal = (item: PesoAHPItem | null = null) => {
+    setCurrentAHPItem(item);
+    setIsModalOpen(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentAHPItem(null);
+  };
+
+  // Função para atualizar o peso
+  const handleUpdatePeso = async () => {
+    if (!currentAHPItem) return;
+
+    const dataToSend = {
+      parametro1: currentAHPItem.parametro1,
+      parametro2: currentAHPItem.parametro2,
+      nivel: currentAHPItem.nivel,
+      pesoDefault: currentAHPItem.pesoDefault ?? 0,
+      pesoUsuario: currentAHPItem.pesoUsuario ?? 0,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/equipamentos-manut/pesosahp`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      handleCloseModal();
+      const fetchData = async (page: number, limit: number, currentFilters: { parametro1: string, parametro2: string, nivel: string }) => {
+        const offset = (page - 1) * limit;
+        // Note: Atualmente os filtros não são enviados para o backend. A filtragem ocorre no frontend sobre a página atual.
+        // Para otimizar, os filtros deveriam ser enviados na URL do fetch.
+        const url = `http://localhost:5000/equipamentos-manut/pesosahp?limit=${limit}&offset=${offset}`;
+        
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          
+          // Adicionar IDs aos dados se necessário (a API atual não retorna ID)
+          const dataWithIds = result.items.map((item: PesoAHPItem, index: number) => ({ ...item, id: item.id || offset + index + 1 }));
+          
+          setDadosOriginais(dataWithIds);
+          setTotalItems(result.totalItems);
+          // Aplicar filtro local inicialmente
+          applyLocalFilter(dataWithIds, currentFilters);
+    
+        } catch (error) {
+          console.error("Erro ao buscar dados de Pesos AHP:", error);
+          // Em caso de erro, limpar dados ou exibir mensagem apropriada
+          setDadosOriginais([]);
+          setDadosFiltrados([]);
+          setTotalItems(0);
+        }
+      };
+      fetchData(currentPage, itemsPerPage, filtros); // Re-fetch data to update table
+    } catch (error) {
+      console.error("Erro ao atualizar Peso AHP:", error);
+      // Optionally, display an error message to the user
+    }
   };
 
   return (
@@ -243,6 +326,7 @@ export default function PesosAHP() {
                       variant="contained"
                       size="small"
                       sx={{ background: "#888", color: "#fff", fontWeight: 600 }}
+                      onClick={() => handleOpenModal(item)} // Abre o modal para editar
                     >
                       Editar
                     </Button>
@@ -265,6 +349,77 @@ export default function PesosAHP() {
 
         </Card>
       </motion.div>
+
+      {/* Modal para Edição de Pesos AHP */}
+      <Dialog
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        
+          <DialogTitle variant="h6" component="h2" mb={2}>
+            Editar Peso AHP
+          </DialogTitle>
+          <DialogContent>
+          <TextField
+            fullWidth
+            label="Parâmetro 1 (Não Editável)"
+            
+            value={currentAHPItem?.parametro1 || ''}
+            InputProps={{ readOnly: true }}
+            sx={{ mb: 2 ,mt:2,background:"#fff"}}
+          />
+          <TextField
+            fullWidth
+            label="Parâmetro 2 (Não Editável)"
+            
+            value={currentAHPItem?.parametro2 || ''}
+            InputProps={{ readOnly: true }}
+            sx={{ mb: 2 ,mt:2,background:"#fff"}}
+          />
+          <TextField
+            fullWidth
+            label="Nível (Não Editável)"
+            
+            value={currentAHPItem?.nivel || ''}
+            InputProps={{ readOnly: true }}
+            sx={{ mb: 2 ,mt:2,background:"#fff"}}
+          />
+          <TextField
+            fullWidth
+            label="Peso Default"
+            type="number"
+            
+            value={currentAHPItem?.pesoDefault ?? ''}
+            onChange={e => setCurrentAHPItem({ ...currentAHPItem!, pesoDefault: parseFloat(e.target.value) || 0 })}
+            sx={{ mb: 2 ,mt:2,background:"#fff"}}
+          />
+          <TextField
+            fullWidth
+            label="Peso Usuário"
+            type="number"
+            
+            value={currentAHPItem?.pesoUsuario ?? ''}
+            onChange={e => setCurrentAHPItem({ ...currentAHPItem!, pesoUsuario: parseFloat(e.target.value) || 0 })}
+            sx={{ mb: 2 ,mt:2,background:"#fff"}}
+          />
+          <DialogActions>
+            <Button onClick={handleCloseModal} >Cancelar</Button>
+            <Button variant="contained" onClick={handleUpdatePeso} sx={{
+           backgroundColor: '#f7801c',
+           '&:hover': {
+             backgroundColor: '#f7801c',
+             color: '#141414'
+           }
+        }}>Salvar</Button>
+          </DialogActions>
+          </DialogContent>
+        
+      </Dialog>
     </Box>
   );
 }

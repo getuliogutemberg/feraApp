@@ -13,16 +13,21 @@ import {
   Button,
   MenuItem,
   Select,
-  Pagination
+  Pagination,
+  DialogTitle,
+  Dialog,
+  DialogActions,
+  DialogContent
 } from "@mui/material";
 import { motion } from "framer-motion";
 
+
 // Interface para o tipo de dado
 interface CustoHxHItem {
-  id: number;
-  ano: number;
-  tuc: number;
-  custo: number;
+  ano: number | null;
+  tuc: number | null;
+  custo: number | null;
+  id?: string; // Add optional id for frontend usage (composite key string)
 }
 
 // Dados de exemplo para a tabela de Custo HxH (mantido para fallback em caso de erro, mas comentado)
@@ -37,17 +42,17 @@ interface CustoHxHItem {
 const anos = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]; // Manter anos para o Select de filtro
 
 export default function CustoHxH() {
+  // State variables
   const [filtros, setFiltros] = useState({ ano: '', tuc: '' });
-  const [dadosOriginais, setDadosOriginais] = useState<CustoHxHItem[]>([]); // Dados da API (apenas a página atual)
-  const [totalItems, setTotalItems] = useState(0); // Total de itens no backend
-  const [currentPage, setCurrentPage] = useState(1); // Página atual
-  const [itemsPerPage] = useState(10); // Quantidade de itens por página (fixo por enquanto)
-  const [dadosFiltrados, setDadosFiltrados] = useState<CustoHxHItem[]>([]); // Dados filtrados localmente (da página atual)
+  const [dadosOriginais, setDadosOriginais] = useState<CustoHxHItem[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [dadosFiltrados, setDadosFiltrados] = useState<CustoHxHItem[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentCustoItem, setCurrentCustoItem] = useState<CustoHxHItem | null>(null);
 
-  // Função para buscar dados com paginação e filtros (os filtros serão aplicados no backend futuramente)
-  
-
-  // Função para aplicar filtro localmente na página atual
+  // Helper functions
   const applyLocalFilter = (dataToFilter: CustoHxHItem[], currentFilters: { ano: string, tuc: string }) => {
     const filtered = dataToFilter.filter(item =>
         (currentFilters.ano === '' || String(item.ano) === String(currentFilters.ano)) &&
@@ -56,53 +61,109 @@ export default function CustoHxH() {
     setDadosFiltrados(filtered);
   };
 
-  // useEffect para buscar dados ao montar o componente ou mudar a página/limite
-  useEffect(() => {
-    const fetchData = async (page: number, limit: number, currentFilters: { ano: string, tuc: string }) => {
-        const offset = (page - 1) * limit;
-        // Note: Atualmente os filtros não são enviados para o backend. A filtragem ocorre no frontend sobre a página atual.
-        // Para otimizar, os filtros deveriam ser enviados na URL do fetch.
-        const url = `http://localhost:5000/equipamentos-manut/custohxh?limit=${limit}&offset=${offset}`;
-    
-        try {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const result = await response.json();
-    
-          // Adicionar IDs aos dados se necessário (a API atual não retorna ID)
-          const dataWithIds = result.items.map((item: CustoHxHItem, index: number) => ({ ...item, id: item.id || offset + index + 1 }));
-    
-          setDadosOriginais(dataWithIds);
-          setTotalItems(result.totalItems);
-          // Aplicar filtro local inicialmente
-          applyLocalFilter(dataWithIds, currentFilters);
-    
-        } catch (error) {
-          console.error("Erro ao buscar dados de Custo HxH:", error);
-          // Em caso de erro, limpar dados ou exibir mensagem apropriada
-          setDadosOriginais([]);
-          setDadosFiltrados([]);
-          setTotalItems(0);
-          // Opcional: usar dados mockados em caso de erro
-          // setDadosOriginais(dadosCusto);
-          // setDadosFiltrados(dadosCusto);
-          // setTotalItems(dadosCusto.length); // Se usar mock, ajuste o total
-        }
-      };
-    fetchData(currentPage, itemsPerPage, filtros);
-  }, [currentPage, itemsPerPage, filtros]); // Dependências: busca novamente ao mudar a página ou limite
+  const fetchData = async (page: number, limit: number, currentFilters: { ano: string, tuc: string }) => {
+    const offset = (page - 1) * limit;
+    const url = `http://localhost:5000/equipamentos-manut/custohxh?limit=${limit}&offset=${offset}`;
 
-  // useEffect para aplicar filtro localmente quando os filtros mudam ou os dados da página chegam
-  useEffect(() => {
-    applyLocalFilter(dadosOriginais, filtros);
-  }, [filtros, dadosOriginais]); // Dependências: aplica filtro ao mudar filtros ou dados da página
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
 
-  // Função para lidar com a mudança de página
+      const dataWithIds = result.items.map((item: CustoHxHItem) => ({
+        ...item,
+        id: `${item.tuc ?? 0}-${item.ano ?? 0}` // Generate a unique ID for frontend display, ensuring numbers
+      }));
+
+      setDadosOriginais(dataWithIds);
+      setTotalItems(result.totalItems);
+      applyLocalFilter(dataWithIds, currentFilters);
+
+    } catch (error) {
+      console.error("Erro ao buscar dados de Custo HxH:", error);
+      setDadosOriginais([]);
+      setDadosFiltrados([]);
+      setTotalItems(0);
+    }
+  };
+
+  const handleOpenModal = (item: CustoHxHItem | null = null) => {
+    setCurrentCustoItem(item || { ano: null, tuc: null, custo: null }); // Initialize with null for number fields to allow empty input
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentCustoItem(null); // Clear the current item when closing the modal
+  };
+
+  const handleCreateUpdateCusto = async () => {
+    if (!currentCustoItem) return;
+
+    // Ensure ano, tuc, and custo are numbers, default to 0 if null
+    const dataToSend = {
+      ano: currentCustoItem.ano ?? 0,
+      tuc: currentCustoItem.tuc ?? 0,
+      custo: currentCustoItem.custo ?? 0,
+    };
+
+    const method = (currentCustoItem.id) ? 'PUT' : 'POST'; // Check for frontend-generated ID for update
+    const url = `http://localhost:5000/equipamentos-manut/custohxh`; // Base URL for both POST and PUT
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      handleCloseModal();
+      fetchData(currentPage, itemsPerPage, filtros); 
+    } catch (error) {
+      console.error(`Erro ao ${method === 'POST' ? 'criar' : 'atualizar'} Custo HxH:`, error);
+    }
+  };
+
+  const handleDeleteCusto = async (tuc: number, ano: number) => {
+    try {
+      const response = await fetch(`http://localhost:5000/equipamentos-manut/custohxh`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tuc, ano }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      fetchData(currentPage, itemsPerPage, filtros);
+    } catch (error) {
+      console.error("Erro ao deletar Custo HxH:", error);
+    }
+  };
+
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
+
+  // useEffect hooks
+  useEffect(() => {
+    fetchData(currentPage, itemsPerPage, filtros);
+  }, [currentPage, itemsPerPage, filtros]);
+
+  useEffect(() => {
+    applyLocalFilter(dadosOriginais, filtros);
+  }, [filtros, dadosOriginais]);
 
   return (
     <Box
@@ -128,6 +189,7 @@ export default function CustoHxH() {
         <Button
           variant="contained"
           sx={{ background: "#FF8C2A", color: "#fff", fontWeight: 600, borderRadius: 2, px: 3 }}
+          onClick={() => handleOpenModal()} // Abre o modal para adicionar novo item
         >
           ● Adicionar Custo HxH
         </Button>
@@ -188,14 +250,15 @@ export default function CustoHxH() {
             <TableBody>
               {dadosFiltrados.map((item: CustoHxHItem) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.ano}</TableCell>
-                  <TableCell>{item.tuc}</TableCell>
-                  <TableCell>{item.custo}</TableCell>
+                  <TableCell>{item.ano ?? ''}</TableCell>
+                  <TableCell>{item.tuc ?? ''}</TableCell>
+                  <TableCell>{item.custo ?? ''}</TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
                       size="small"
                       sx={{ background: "#888", color: "#fff", fontWeight: 600, mr: 1 }}
+                      onClick={() => handleOpenModal(item)} // Abre o modal para editar
                     >
                       Editar
                     </Button>
@@ -203,6 +266,7 @@ export default function CustoHxH() {
                       variant="contained"
                       size="small"
                       sx={{ background: "#FF8C2A", color: "#fff", fontWeight: 600 }}
+                      onClick={() => handleDeleteCusto(item.tuc ?? 0, item.ano ?? 0)} // Chama a função para excluir com tuc e ano
                     >
                       Excluir
                     </Button>
@@ -224,6 +288,70 @@ export default function CustoHxH() {
           </Box>
         </Card>
       </motion.div>
+
+      {/* Modal para Adicionar/Editar Custo HxH */}
+      <Dialog
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        
+      >
+      
+      <DialogTitle>
+            {currentCustoItem && currentCustoItem.id ? 'Editar Custo HxH' : 'Adicionar Novo Custo HxH'}
+            </DialogTitle>
+            <DialogContent>
+
+            
+          
+          <TextField 
+           fullWidth
+           label={currentCustoItem && currentCustoItem.id ? "Ano (Não Editável)" : "Ano"}
+            type="number"
+            margin="normal"
+            InputProps={{ readOnly:  currentCustoItem && currentCustoItem.id ? true : false }}
+            name="ano"
+            value={currentCustoItem?.ano ?? ''}
+            onChange={e => setCurrentCustoItem({ ...currentCustoItem!, ano: parseInt(e.target.value) || null })}
+            sx={{ mb: 2, background: "#fff" }}
+          />
+
+ 
+          <TextField 
+            fullWidth
+            label={currentCustoItem && currentCustoItem.id ? "TUC (Não Editável)" : "TUC"}
+            type="number"
+            margin="normal"
+            name="tuc"
+            InputProps={{ readOnly:  currentCustoItem && currentCustoItem.id ? true : false }}
+            value={currentCustoItem?.tuc ?? ''}
+            onChange={e => setCurrentCustoItem({ ...currentCustoItem!, tuc: parseInt(e.target.value) || null })}
+            sx={{ mb: 2, background: "#fff" }}
+          />
+          
+
+          <TextField
+            fullWidth
+            label="Custo"
+            type="number"
+            margin="normal"
+            name="custo"
+            value={currentCustoItem?.custo ?? ''}
+            onChange={e => setCurrentCustoItem({ ...currentCustoItem!, custo: parseInt(e.target.value) || null })}
+            sx={{ mb: 2, background: "#fff" }}
+          />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseModal} sx={{ mr: 2 }}>Cancelar</Button>
+            <Button variant="contained" onClick={handleCreateUpdateCusto} sx={{
+           backgroundColor: '#f7801c',
+           '&:hover': {
+             backgroundColor: '#f7801c',
+             color: '#141414'
+           }
+        }}>Salvar</Button>
+            </DialogActions>
+        
+      </Dialog>
     </Box>
   );
 } 

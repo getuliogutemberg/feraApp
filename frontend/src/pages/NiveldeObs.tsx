@@ -11,7 +11,11 @@ import {
   TableCell,
   Grid,
   Button,
-  Pagination
+  Pagination,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -38,6 +42,8 @@ export default function NiveldeObs() {
   const [currentPage, setCurrentPage] = useState(1); // Página atual
   const [itemsPerPage] = useState(10); // Quantidade de itens por página (fixo por enquanto)
   const [dadosFiltrados, setDadosFiltrados] = useState<ObsolescenciaItem[]>([]); // Dados filtrados localmente (da página atual)
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar a abertura/fechamento do modal
+  const [currentObsItem, setCurrentObsItem] = useState<ObsolescenciaItem | null>(null); // Armazena o item sendo editado
 
   // Função para buscar dados com paginação e filtros (os filtros serão aplicados no backend futuramente)
   const fetchData = async (page: number, limit: number, currentFilters: { codigo: string, peso: string }) => {
@@ -92,6 +98,48 @@ export default function NiveldeObs() {
   // Função para lidar com a mudança de página
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
+  };
+
+  // Função para abrir o modal
+  const handleOpenModal = (item: ObsolescenciaItem | null = null) => {
+    setCurrentObsItem(item);
+    setIsModalOpen(true);
+  };
+
+  // Função para fechar o modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentObsItem(null);
+  };
+
+  // Função para atualizar o item
+  const handleUpdateObs = async () => {
+    if (!currentObsItem || currentObsItem.codigo === null || currentObsItem.peso === null) return;
+
+    const dataToSend = {
+      codigo: currentObsItem.codigo,
+      peso: currentObsItem.peso,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/equipamentos-manut/obsolescencia`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      handleCloseModal();
+      fetchData(currentPage, itemsPerPage, filtros); // Re-fetch data to update table
+    } catch (error) {
+      console.error("Erro ao atualizar Nível de Obsolescencia:", error);
+      // Optionally, display an error message to the user
+    }
   };
 
   return (
@@ -171,6 +219,7 @@ export default function NiveldeObs() {
                       variant="contained"
                       size="small"
                       sx={{ background: "#888", color: "#fff", fontWeight: 600 }}
+                      onClick={() => handleOpenModal(item)} // Abre o modal para editar
                     >
                       Editar
                     </Button>
@@ -193,6 +242,50 @@ export default function NiveldeObs() {
 
         </Card>
       </motion.div>
+
+      {/* Modal para Edição de Nível de Obsolescencia */}
+      <Dialog
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        
+        
+      >
+        
+          <DialogTitle>
+            Editar Nível de Obsolescencia
+            </DialogTitle>
+            <DialogContent>
+          <TextField
+            fullWidth
+            label="Código do Equipamento (Não Editável)"
+            margin="normal"
+            value={currentObsItem?.codigo || ''}
+            InputProps={{ readOnly: true }}
+            sx={{ mb: 2, background: "#fff" }}
+          />
+          <TextField
+            fullWidth
+            label="Peso"
+            type="number"
+            margin="normal"
+            value={currentObsItem?.peso ?? ''}
+            onChange={e => setCurrentObsItem({ ...currentObsItem!, peso: parseFloat(e.target.value) || 0 })}
+            sx={{ mb: 2, background: "#fff" }}
+          />
+          </DialogContent>
+          <DialogActions>
+         
+            <Button onClick={handleCloseModal} >Cancelar</Button>
+            <Button variant="contained" onClick={handleUpdateObs} sx={{
+           backgroundColor: '#f7801c',
+           '&:hover': {
+             backgroundColor: '#f7801c',
+             color: '#141414'
+           }
+        }}>Salvar</Button>
+          </DialogActions>
+        
+      </Dialog>
     </Box>
   );
 } 
