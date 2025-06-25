@@ -36,6 +36,7 @@ import ForgotPassword from './pages/ForgotPassword.tsx';
 import ResetPassword from './pages/ResetPassword.tsx';
 import NiveldeObs from './pages/NiveldeObs.tsx';
 import CustoHxH from './pages/CustoHxH.tsx';
+import AdminDatabase from './pages/AdminDatabase';
 
 interface Configuration {
   notifications: boolean;
@@ -265,6 +266,11 @@ function App() {
         } />
 
         <Route path="/rota-restrita" element={ <Unauthorized/> } /> 
+        <Route path="/admin-database" element={
+          <ProtectedRoute requiredRole={['ADMIN', 'OWNER']}>
+            <AdminDatabase />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
         
       </Routes>

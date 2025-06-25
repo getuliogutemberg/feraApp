@@ -191,6 +191,7 @@ const Sidebar = () => {
 
       <ul className="sidebar-options">
         {['ADMIN','OWNER'].includes(user.className) && <li title="Opcões"><Link to="/opções"><CircleEllipsis  /> <span>Opções</span></Link></li> }
+        {['ADMIN','OWNER'].includes(user.className) && <li title="Dados"><Link to="/admin-database"><FaCog /> <span>Dados</span></Link></li>}
         {['ADMIN','OWNER'].includes(user.className) && <li title="Administrador"><Link to="/administrador"><Wallpaper  /><span>Administrador</span></Link></li>}
         
 

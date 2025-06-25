@@ -18,6 +18,7 @@ import MaterialsController from "./controllers/materialsController";
 import ParamsController from "./controllers/paramsController"; 
 import { setupSocket } from "./socket";
 import equipamentoManutRoutes from './routes/equipamentoManut';
+import adminDatabaseRoutes from './routes/adminDatabase';
 
 sequelize.authenticate()
   .then(() => console.log("Banco de dados conectado"))
@@ -103,6 +104,7 @@ app.put('/params/reset/group/:groupId', ParamsController.resetGroupItems); // Ro
 app.put('/params/reset/material/:materialId', ParamsController.resetItem); // Rota restaurar padrão de estrategia de um item de um grupo
 
 app.use('/equipamentos-manut', equipamentoManutRoutes);
+app.use('/api/admin/database', adminDatabaseRoutes);
 
 const server: Server = http.createServer(app);
 
