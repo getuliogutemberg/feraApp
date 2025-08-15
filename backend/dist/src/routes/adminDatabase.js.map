@@ -1,0 +1,1 @@
+{"version":3,"file":"adminDatabase.js","sourceRoot":"","sources":["../../../src/routes/adminDatabase.ts"],"names":[],"mappings":";;;;;AAAA,qCAAiC;AACjC,qGAA6E;AAE7E,MAAM,MAAM,GAAG,IAAA,gBAAM,GAAE,CAAC;AAExB,MAAM,CAAC,IAAI,CAAC,OAAO,EAAE,iCAAuB,CAAC,cAAc,CAAC,CAAC;AAC7D,MAAM,CAAC,IAAI,CAAC,SAAS,EAAE,iCAAuB,CAAC,UAAU,CAAC,CAAC;AAE3D,kBAAe,MAAM,CAAC"}

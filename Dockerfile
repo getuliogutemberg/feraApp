@@ -1,5 +1,5 @@
 # Build do Frontend
-FROM node:18 AS build-frontend
+FROM node:22 AS build-frontend
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
@@ -8,7 +8,7 @@ RUN npm rebuild esbuild
 RUN npm run build
 
 # Build do Backend
-FROM node:18 AS build-backend
+FROM node:22 AS build-backend
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm install --production

@@ -55,7 +55,7 @@ const Navbar = () => {
                 gap:'30px',
                 transition: "all 0.1 seconds ease"
             }}>
-                <>
+                
                 <li style={{
                 //    textDecoration: 'none',
                 display:'flex',
@@ -69,15 +69,18 @@ const Navbar = () => {
                     <div style={{width:'32px',height:'16px',background:"#d3d3d3",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'17px',height:'12px',background:"#f3811e"}}></div></div>
                     <div style={{width:'17px',height:'15px',background:"#d3d3d3",display:'flex',flexDirection:"column",justifyContent:"center",alignItems:"start"}}><div style={{width:'12px',height:'13px',background:"#f3811e"}}></div></div>
                    
-                    </div>FERA</li>
-                <li style={{
-                //    textDecoration: 'none',
+                    </div>
+                    <div className="title">FERA</div>
+                </li>
+                <li className="path" style={{
+                   textDecoration: 'none',
                    
                    fontWeight: 'bold',
                    fontSize: '1.5rem'
-                }}>{decodeURIComponent(formattedPath)}</li>
-                {/* <li><span>{formattedPath}</span></li> */}
-                </>
+                }}>{decodeURIComponent(formattedPath)}
+                </li>
+              
+                
             </ul>
             <ul className="nav-list">
                 {!user ? (
