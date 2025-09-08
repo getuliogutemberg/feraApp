@@ -133,4 +133,4 @@ const startServer = async (port: number): Promise<void> => {
 setupSocket(server);
 
 // Inicia o servidor
-startServer(Number(process.env.PORT) || 5000);
+startServer(Number(process.env.PORT) || 8080);
