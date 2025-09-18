@@ -188,3 +188,4 @@ Este projeto está sob a licença MIT.
 
 **Dúvidas?**  
 Abra uma issue ou entre em contato com o mantenedor do projeto.
+teste
